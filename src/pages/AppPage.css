@@ -1,0 +1,199 @@
+/* ================================================
+   ESTIM APP – AppPage.css (Refactorisé)
+   ================================================ */
+
+/* -- Fond général -- */
+.app-content {
+  --background: #F9FCF5;
+}
+
+/* ----------------------------------
+   HEADER
+---------------------------------- */
+.app-header ion-toolbar {
+  --background: white;
+  --min-height: 76px;
+  --border-width: 0;
+}
+
+.app-header ion-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #000;
+  padding-left: 16px;
+}
+
+/* ----------------------------------
+   RECHERCHE
+---------------------------------- */
+.search-container {
+  padding: 20px 16px;
+}
+
+.search-box {
+  background: #F5F5F5;
+  border: 0.5px solid #BDBDBD;
+  border-radius: 8px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+}
+
+.search-box input {
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 16px;
+  color: #919191;
+}
+
+.search-icon {
+  font-size: 20px;
+  color: #BFBFBF;
+}
+
+/* ----------------------------------
+   SECTIONS
+---------------------------------- */
+.app-section {
+  margin-bottom: 24px;
+}
+
+.section-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #303030;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-left: 16px;
+  margin-bottom: 12px;
+}
+
+/* -- Conteneur du scroll horizontal -- */
+.cards-scroll {
+  display: flex;
+  overflow-x: auto;
+  padding: 0 16px;
+  gap: 12px;
+  scrollbar-width: none; /* Firefox */
+}
+
+.cards-scroll::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* ----------------------------------
+   CARTE FONCTIONNALITÉ (Composant)
+---------------------------------- */
+.feature-card-wrapper {
+  position: relative;
+  min-width: 294px;   /* Largeur basée sur ton code brut */
+  height: 125px;      /* Hauteur basée sur ton code brut */
+  border-radius: 12px;
+  border: 0.5px solid #C4C4C4;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* Overlay gradient (somme en bas pour lisibilité) */
+.feature-card-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  background: linear-gradient(180deg, rgba(18, 18, 18, 0) 0%, rgba(18, 18, 18, 0.90) 100%);
+  z-index: 1;
+}
+
+.feature-card-content {
+  position: relative;
+  z-index: 2;
+  padding: 16px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+/* Texte */
+.feature-text-block {
+  flex: 1;
+}
+
+.feature-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.feature-card-subtitle {
+  font-size: 10px;
+  color: #E8E8E8;
+  margin: 0;
+}
+
+/* Bouton dans la carte */
+.feature-card-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border-radius: 50px;
+  border: none;
+  font-size: 11px;
+  font-weight: 700;
+  color: #262626; /* Couleur texte bouton par défaut */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-icon {
+  font-size: 12px;
+  margin-left: 2px;
+}
+
+/* ----------------------------------
+   INDICATEURS (POINTS)
+---------------------------------- */
+.scroll-indicator {
+  display: flex;
+  justify-content: flex-start;
+  padding: 12px 16px 0;
+  gap: 6px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #CCCCCC;
+}
+
+.dot.active {
+  background-color: #4C4C4C;
+}
+
+/* ----------------------------------
+   BADGE "BIENTÔT DISPONIBLE"
+---------------------------------- */
+.coming-soon-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #666;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 3;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}

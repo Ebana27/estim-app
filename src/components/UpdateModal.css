@@ -1,0 +1,60 @@
+.update-modal::part(content) {
+  --width: min(92vw, 420px);
+  --height: auto;
+  --border-radius: 20px;
+  --background: #ffffff;
+}
+
+.update-modal__content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: #1f1f1f;
+}
+
+.update-modal__title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.update-modal__subtitle {
+  margin: 0;
+  color: #4b4b4b;
+  line-height: 1.4;
+}
+
+.update-modal__notes {
+  margin: 0;
+  color: #2f2f2f;
+  background: #f5f5f5;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.update-modal__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.update-btn {
+  flex: 1;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.update-btn--primary {
+  background: #2dc653;
+  color: #0d1b12;
+}
+
+.update-btn--ghost {
+  background: #f1f3f4;
+  color: #1f1f1f;
+}

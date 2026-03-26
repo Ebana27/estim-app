@@ -1,0 +1,158 @@
+/* src\theme\variables.css */
+/* ==========================================
+   ESTIM APP THEME - Style "Modern Clean"
+   ========================================== */
+
+:root {
+  /* --- Palette de Couleurs ESTIM --- */
+  --estim-green: #117a2a;
+  --estim-green-rgb: 17, 122, 42;
+  --estim-gold: #ffd036;
+  --estim-gold-rgb: 255, 208, 54;
+  --estim-black: #121212;
+  --estim-white: #ffffff;
+  --estim-smoke: #f4f5f8; /* Gris très clair pour les fonds */
+
+  /* --- Ionic Primary Colors --- */
+  --ion-color-primary: var(--estim-green);
+  --ion-color-primary-rgb: var(--estim-green-rgb);
+  --ion-color-primary-contrast: var(--estim-white);
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #0f6c25;
+  --ion-color-primary-tint: #29873f;
+
+  --ion-color-secondary: var(--estim-gold);
+  --ion-color-secondary-rgb: var(--estim-gold-rgb);
+  --ion-color-secondary-contrast: var(--estim-black);
+  --ion-color-secondary-contrast-rgb: 0, 0, 0;
+
+  /* --- Arrière-plan global --- */
+  /* Fond général légèrement gris pour détacher les cartes blanches */
+  --ion-background-color: var(--estim-smoke);
+  --ion-background-color-rgb: 244, 245, 248;
+
+  /* --- Texte --- */
+  --ion-text-color: var(--estim-black);
+  --ion-text-color-rgb: 18, 18, 18;
+
+  /* --- Toolbar (Barre du haut) --- */
+  /* Fond Blanc pour un look épuré, très moderne */
+  --ion-toolbar-background: var(--estim-white);
+  --ion-toolbar-color: var(--estim-black);
+  --ion-toolbar-border-color: #e0e0e0; /* Ligne de séparation subtile en bas */
+
+  /* --- Tab Bar (Barre du bas) --- */
+  /* Fond Blanc, style natif iOS/Android moderne */
+  --ion-tab-bar-background: var(--estim-white);
+  --ion-tab-bar-color: #a0a0a0; /* Gris pour icônes inactives */
+  --ion-tab-bar-color-selected: var(--estim-green); /* Vert pour l'icône active */
+  --ion-tab-bar-border-color: #e0e0e0; /* Ligne subtile en haut */
+
+  /* --- Items (Listes & Cartes) --- */
+  /* Les items doivent être blancs pour ressortir sur le fond smoke */
+  --ion-item-background: var(--estim-white);
+  --ion-item-border-color: transparent;
+
+  /* --- Inputs (Champs de saisie) --- */
+  --ion-placeholder-color: #999999;
+
+  /* --- Bordures & Ombres (Vos contraintes) --- */
+  --ion-border-color: transparent;
+  --ion-box-shadow-color: transparent;
+  
+  /* --- Overlays (Alertes, Popups) --- */
+  --ion-overlay-background-color: var(--estim-white);
+  --ion-backdrop-color: var(--estim-black);
+  --ion-backdrop-opacity: 0.32; /* Opacité douce */
+
+  /* --- Variables Esthétiques --- */
+  --estim-btn-radius: 12px;
+}
+
+/* ==========================================
+   STYLES DES COMPOSANTS
+   ========================================== */
+
+/* Boutons : Style moderne, bien arrondi, sans ombre dure */
+ion-button {
+  --border-radius: var(--estim-btn-radius);
+  --box-shadow: none;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* Bouton Principal (Vert) */
+ion-button[color="primary"] {
+  --background: var(--estim-green);
+  --background-hover: #0f6c25;
+  --color: var(--estim-white);
+}
+
+/* Bouton Secondaire (Doré/Jaune) - Idéal pour les CTA comme sur vos screenshots */
+ion-button[color="secondary"] {
+  --background: var(--estim-gold);
+  --color: var(--estim-black);
+}
+
+/* Bouton Transparent (Texte seulement) */
+ion-button[fill="clear"] {
+  --color: var(--estim-green);
+}
+
+/* Inputs : Style "Material Design" flat */
+ion-item.item-has-focus {
+  --highlight-background: var(--estim-green);
+}
+
+/* ==========================================
+   AJUSTEMENTS PLATEFORME (iOS/MD)
+   ========================================== */
+
+:root.ios {
+  --ion-toolbar-border-color: transparent; /* iOS a souvent des bordures transparentes par défaut */
+  /* Forcer le style sur iOS pour unifier */
+  --ion-toolbar-background: var(--estim-white);
+}
+
+:root.md {
+  --ion-toolbar-border-color: transparent;
+}
+
+/* Effet de survol très subtil (Ripple) */
+ion-item::part(native) {
+  --ripple-color: rgba(17, 122, 42, 0.1);
+}
+
+/* ================================================
+   ESTIM APP – estim.css (Styles globaux)
+   À importer dans App.jsx
+   ================================================ */
+
+/* ── Tab Bar globale ── */
+ion-tab-bar {
+  --background: var(--estim-white);
+  --border: 1px solid #e0e0e0;
+  height: 64px;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+ion-tab-button {
+  --color: #a0a0a0;
+  --color-selected: var(--estim-green);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+ion-tab-button ion-icon {
+  font-size: 22px;
+}
+
+ion-tab-button ion-label {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* ── Ripple vert au tap ── */
+ion-tab-button::part(native) {
+  --ripple-color: rgba(17, 122, 42, 0.1);
+}
