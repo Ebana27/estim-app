@@ -11,27 +11,51 @@ import {
 import { searchOutline, chevronForwardOutline } from "ionicons/icons";
 import "./AppPage.css";
 
+// ──────────────────────────────────────────────────────────────────
+// Images Unsplash – une image pertinente par fonctionnalité
+// Tu peux les remplacer par tes propres assets locaux plus tard
+// ──────────────────────────────────────────────────────────────────
+const IMAGES = {
+  // Académique
+  EDT:         "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=400&q=70",   // calendrier / agenda
+  ABSENCES:    "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&q=70",   // salle de classe vide
+
+  // Ressources
+  BIBLIO:      "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=70",   // bibliothèque
+  RESSOURCES:  "https://images.unsplash.com/photo-1513258496099-48168024aec0?w=400&q=70",   // documents / cours
+
+  // Suivi
+  PRESENCE:    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=70",   // scan / pointage
+  NOTES:       "https://images.unsplash.com/photo-1588072432836-e10032774350?w=400&q=70",   // notes / résultats
+
+  // Communauté
+  BDE:         "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&q=70",   // groupe d'étudiants
+  CHAT:        "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&q=70",      // discussion / chat
+};
+
 const FEATURE_SECTIONS = [
   {
     label: "ACADEMIQUE",
     items: [
       {
         title: "EMPLOI DU TEMPS",
-        subtitle: "Consultez",
-        buttonText: "Lire",
-        bgColor: "#FFF5C7",
+        subtitle: "Consultez votre planning",
+        buttonText: "Consulter",
+        bgColor: "#b8860b",
         btnColor: "#FFE057",
-        textColor: "#ffffff",
+        btnTextColor: "#333",
+        image: IMAGES.EDT,
         available: true,
         route: "/edt",
       },
       {
         title: "ABSENCES",
-        subtitle: "Justifier",
+        subtitle: "Justifier vos absences",
         buttonText: "Voir",
-        bgColor: "#FFF5C7",
+        bgColor: "#8a6500",
         btnColor: "#FFE057",
-        textColor: "#fffefe",
+        btnTextColor: "#333",
+        image: IMAGES.ABSENCES,
         available: true,
         route: "/absences",
       },
@@ -41,20 +65,24 @@ const FEATURE_SECTIONS = [
     label: "RESSOURCES",
     items: [
       {
-        title: "BIBLIOTHEQUE",
-        subtitle: "References et documents",
+        title: "BIBLIOTHÈQUE",
+        subtitle: "Références et documents",
         buttonText: "Lire",
-        bgColor: "#B6FF91",
-        btnColor: "#EDFFEB",
+        bgColor: "#1a7a34",
+        btnColor: "#fff",
+        btnTextColor: "#1a7a34",
+        image: IMAGES.BIBLIO,
         available: true,
         route: "/bibliotheque",
       },
       {
         title: "RESSOURCES",
-        subtitle: "Cours & Docs",
+        subtitle: "Cours & documents",
         buttonText: "Ouvrir",
-        bgColor: "#B5FFB9",
+        bgColor: "#15622a",
         btnColor: "#FFE057",
+        btnTextColor: "#333",
+        image: IMAGES.RESSOURCES,
         available: true,
         route: "/ressources",
       },
@@ -64,30 +92,60 @@ const FEATURE_SECTIONS = [
     label: "SUIVI",
     items: [
       {
-        title: "PRESENCE",
-        subtitle: "Marquer Votre Presence",
+        title: "PRÉSENCE",
+        subtitle: "Marquer votre présence",
         buttonText: "Scan",
-        bgColor: "#FFADAD",
+        bgColor: "#b03030",
         btnColor: "#FF6352",
-        textColor: "#fff",
+        btnTextColor: "#fff",
+        image: IMAGES.PRESENCE,
         available: true,
         route: "/presence",
       },
       {
         title: "NOTES",
-        subtitle: "Consultation",
+        subtitle: "Consulter vos résultats",
         buttonText: "Voir",
-        bgColor: "#FFCFC9",
+        bgColor: "#8a2020",
         btnColor: "#FFE057",
+        btnTextColor: "#333",
+        image: IMAGES.NOTES,
         available: true,
         route: "/notes",
+      },
+    ],
+  },
+  {
+    label: "COMMUNAUTÉ",
+    items: [
+      {
+        title: "BDE",
+        subtitle: "Déposer vos plaintes",
+        buttonText: "Déposer",
+        bgColor: "#1a5fa0",
+        btnColor: "#52b1ff",
+        btnTextColor: "#fff",
+        image: IMAGES.BDE,
+        available: true,
+        route: "/bde",
+      },
+      {
+        title: "ESTIM CHAT",
+        subtitle: "Chater avec la communauté",
+        buttonText: "Chater",
+        bgColor: "#154d82",
+        btnColor: "#52b1ff",
+        btnTextColor: "#fff",
+        image: IMAGES.CHAT,
+        available: true,
+        route: "/estim-chat",
       },
     ],
   },
 ];
 
 /* ================================================
-   COMPOSANT REUTILISABLE : FeatureCard
+   COMPOSANT : FeatureCard  (carte carrée)
    ================================================ */
 const FeatureCard = ({
   title,
@@ -95,7 +153,8 @@ const FeatureCard = ({
   buttonText,
   bgColor,
   btnColor,
-  textColor = "#fff",
+  btnTextColor,
+  image,
   available = true,
   route,
   onOpen,
@@ -106,29 +165,31 @@ const FeatureCard = ({
   };
 
   return (
-    <div
-      className="feature-card-wrapper"
-      style={{
-        backgroundColor: bgColor,
-        opacity: available ? 1 : 0.6,
-        position: "relative",
-      }}
-    >
+    <div className="feature-card" onClick={handleClick}>
+
+      {/* ── Image de fond (peu opaque) ── */}
+      <img src={image} alt={title} className="feature-card-bg" />
+
+      {/* ── Couche de couleur par-dessus l'image ── */}
+      <div
+        className="feature-card-color-layer"
+        style={{ background: bgColor }}
+      />
+
+      {/* ── Dégradé sombre en bas pour lisibilité ── */}
+      <div className="feature-card-fade" />
+
+      {/* ── Badge "bientôt disponible" ── */}
       {!available && (
-        <div className="coming-soon-badge">
-          Bientot disponible
-        </div>
+        <div className="coming-soon-badge">Bientôt disponible</div>
       )}
 
-      <div className="feature-card-overlay" />
-
+      {/* ── Contenu texte + bouton ── */}
       <div className="feature-card-content">
         <div className="feature-text-block">
-          <h3 className="feature-card-title" style={{ color: textColor || "#fff" }}>
-            {title}
-          </h3>
+          <h3 className="feature-card-title">{title}</h3>
           <p className="feature-card-subtitle">
-            {available ? subtitle : "Fonctionnalite en developpement"}
+            {available ? subtitle : "Fonctionnalité en développement"}
           </p>
         </div>
         <button
@@ -136,15 +197,17 @@ const FeatureCard = ({
           className="feature-card-btn"
           style={{
             backgroundColor: btnColor,
+            color: btnTextColor || "#333",
             cursor: available ? "pointer" : "not-allowed",
           }}
-          onClick={handleClick}
+          onClick={(e) => { e.stopPropagation(); handleClick(); }}
           disabled={!available}
         >
           {available ? buttonText : "Indisponible"}
           <IonIcon icon={chevronForwardOutline} className="btn-icon" />
         </button>
       </div>
+
     </div>
   );
 };
@@ -178,37 +241,39 @@ const AppPage = () => {
       </IonHeader>
 
       <IonContent className="app-content" fullscreen>
+
+        {/* ── Barre de recherche ── */}
         <div className="search-container">
           <div className="search-box">
             <IonIcon icon={searchOutline} className="search-icon" />
             <input
               type="text"
-              placeholder="Rechercher une fonctionnalite"
+              placeholder="Rechercher une fonctionnalité"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
         </div>
 
+        {/* ── Sections avec cartes carrées ── */}
         {filteredSections.map((section) => (
           <section key={section.label} className="app-section">
+
+            {/* Titre de la section */}
             <h2 className="section-label">{section.label}</h2>
+
+            {/* Rangée de cartes scrollable */}
             <div className="cards-scroll">
               {section.items.map((item) => (
                 <FeatureCard
                   key={item.title}
-                  title={item.title}
-                  subtitle={item.subtitle}
-                  buttonText={item.buttonText}
-                  bgColor={item.bgColor}
-                  btnColor={item.btnColor}
-                  textColor={item.textColor}
-                  available={item.available}
-                  route={item.route}
+                  {...item}
                   onOpen={(route) => history.push(route)}
                 />
               ))}
             </div>
+
+            {/* Points indicateurs */}
             <div className="scroll-indicator">
               {section.items.map((item, index) => (
                 <span
@@ -217,8 +282,11 @@ const AppPage = () => {
                 />
               ))}
             </div>
+
           </section>
         ))}
+
+        <div style={{ height: 32 }} />
       </IonContent>
     </IonPage>
   );

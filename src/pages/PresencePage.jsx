@@ -1,11 +1,13 @@
 import FeatureListPage from "./FeatureListPage";
+import { alertFunc } from "../utils/estimAlertFunc.js"
 
 const Page = () => (
+  alertFunc(),
   <FeatureListPage
-    title=\"Presence\"
-    subtitle=\"Vos presences\"
-    endpoint=\"/presence\"
-    emptyLabel=\"Aucune presence\"
+    title="Presence"
+    subtitle="Vos presences"
+    endpoint="/presence"
+    emptyLabel="Aucune presence"
   />
 );
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   IonContent,
   IonHeader,
@@ -7,36 +7,35 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import { Browser } from "@capacitor/browser";
-import { useHistory } from "react-router-dom";
-import { notificationsOutline, timeOutline, locationOutline } from "ionicons/icons";
+import {
+  chevronBackOutline,
+  chevronForwardOutline,
+  notificationsOutline,
+} from "ionicons/icons";
 import UpdateModal from "../components/UpdateModal";
 import useVersionCheck from "../hooks/useVersionCheck";
-import EstimApi from "../api/estimApi";
-import { mapApiAdToAnnouncement, mapApiEdtToCourse } from "../utils/estimMappers";
 import "./HomePage.css";
 import heroImage from "../assets/img/Hero.png";
+import logoIcon from "../assets/icon/icon40x40.svg";
+import gallery2025 from "../assets/img/gallery/estim-5.jpg";
+import gallery2024 from "../assets/img/gallery/estim-4.jpg";
+import gallery2023 from "../assets/img/gallery/estim-3.jpg";
+import gallery2022 from "../assets/img/gallery/estim-2.jpg";
+import gallery2021 from "../assets/img/gallery/estim-1.jpg";
 
-const api = new EstimApi();
-const fallbackAdImage =
-  "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=500&q=60";
-const fallbackAnnouncement = {
-  title: "ESTIM APP",
-  body: "Decouvrir l'application creee par un etudiant pour des etudiants....",
-  image: fallbackAdImage,
-};
-const fallbackCourse = {
-  title: "ANGLAIS",
-  timeRange: "09H00 - 10H30",
-  salle: "Salle : Martin Luther King",
-};
+const galleryItems = [
+  { year: 2025, title: "ESTIM 2025", src: gallery2025 },
+  { year: 2024, title: "ESTIM 2024", src: gallery2024 },
+  { year: 2023, title: "ESTIM 2023", src: gallery2023 },
+  { year: 2022, title: "ESTIM 2022", src: gallery2022 },
+  { year: 2021, title: "ESTIM 2021", src: gallery2021 },
+];
 
 const HomePage = () => {
   const { isUpdateOpen, closeUpdate, remoteInfo } = useVersionCheck();
-  const history = useHistory();
-  const [latestAd, setLatestAd] = useState(null);
-  const [nextCourse, setNextCourse] = useState(null);
-  const [loadingAd, setLoadingAd] = useState(true);
-  const [loadingCourse, setLoadingCourse] = useState(true);
+  const galleryRef = useRef(null);
+  const rafRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const handleDownload = async () => {
     const url = remoteInfo?.downloadUrl;
@@ -48,46 +47,54 @@ const HomePage = () => {
     }
   };
 
+  const scrollToIndex = (index) => {
+    const container = galleryRef.current;
+    if (!container) return;
+    const items = container.querySelectorAll(".gallery-item");
+    const target = items[index];
+    if (!target) return;
+    container.scrollTo({
+      left: target.offsetLeft - (container.clientWidth - target.clientWidth) / 2,
+      behavior: "smooth",
+    });
+  };
+
+  const handlePrev = () => {
+    const nextIndex = Math.max(0, activeIndex - 1);
+    scrollToIndex(nextIndex);
+  };
+
+  const handleNext = () => {
+    const nextIndex = Math.min(galleryItems.length - 1, activeIndex + 1);
+    scrollToIndex(nextIndex);
+  };
+
+  const handleScroll = () => {
+    const container = galleryRef.current;
+    if (!container) return;
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      const items = Array.from(container.querySelectorAll(".gallery-item"));
+      if (!items.length) return;
+      const center = container.scrollLeft + container.clientWidth / 2;
+      let closest = 0;
+      let minDistance = Number.POSITIVE_INFINITY;
+      items.forEach((item, index) => {
+        const itemCenter = item.offsetLeft + item.clientWidth / 2;
+        const distance = Math.abs(center - itemCenter);
+        if (distance < minDistance) {
+          minDistance = distance;
+          closest = index;
+        }
+      });
+      setActiveIndex(closest);
+    });
+  };
+
   useEffect(() => {
-    let isMounted = true;
-
-    const loadAds = async () => {
-      try {
-        const list = await api.getAd();
-        const mapped = list.map((ad) => mapApiAdToAnnouncement(ad, fallbackAdImage));
-        if (isMounted) setLatestAd(mapped[0] || null);
-      } catch (err) {
-        console.error("Erreur chargement annonces:", err);
-      } finally {
-        if (isMounted) setLoadingAd(false);
-      }
-    };
-
-    const loadEdt = async () => {
-      try {
-        const list = await api.getEdt();
-        const mapped = list.map((evt) => mapApiEdtToCourse(evt));
-        const now = new Date();
-        const upcoming = mapped
-          .filter((c) => c?.rawDate && new Date(c.rawDate) >= now)
-          .sort((a, b) => new Date(a.rawDate) - new Date(b.rawDate));
-        const fallback = mapped
-          .filter((c) => c?.rawDate)
-          .sort((a, b) => new Date(a.rawDate) - new Date(b.rawDate));
-
-        if (isMounted) setNextCourse(upcoming[0] || fallback[0] || null);
-      } catch (err) {
-        console.error("Erreur chargement EDT:", err);
-      } finally {
-        if (isMounted) setLoadingCourse(false);
-      }
-    };
-
-    loadAds();
-    loadEdt();
-
+    scrollToIndex(0);
     return () => {
-      isMounted = false;
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
@@ -98,7 +105,7 @@ const HomePage = () => {
           <div className="header-inner">
             <div className="header-brand">
               <img
-                src="/src/assets/icon/icon40x40.svg"
+                src={logoIcon}
                 alt="ESTIM Logo"
                 className="header-logo"
               />
@@ -128,77 +135,55 @@ const HomePage = () => {
         <section className="section">
           <div className="section-header">
             <div>
-              <h2 className="section-title">Dernieres annonces</h2>
-              <p className="section-subtitle">Annonces les plus recentes</p>
+              <h2 className="section-title">Galerie ESTIM</h2>
+              <p className="section-subtitle">
+                Les 5 precedentes annees en images
+              </p>
             </div>
-            <button className="section-more" onClick={() => history.push("/annonces")}>
-              Plus
+          </div>
+
+          <div className="gallery-wrap">
+            <div className="gallery-scroll" ref={galleryRef} onScroll={handleScroll}>
+              {galleryItems.map((item, index) => (
+                <div className="gallery-item" key={item.year}>
+                  <img
+                    src={item.src}
+                    alt={item.title}
+                    className="gallery-image"
+                    loading={index === 0 ? "eager" : "lazy"}
+                  />
+                  <div className="gallery-overlay" />
+                  <div className="gallery-caption">
+                    <p className="gallery-year">{item.year}</p>
+                    <p className="gallery-title">{item.title}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button
+              className="gallery-nav gallery-nav-left"
+              onClick={handlePrev}
+              aria-label="Precedent"
+            >
+              <IonIcon icon={chevronBackOutline} />
+            </button>
+            <button
+              className="gallery-nav gallery-nav-right"
+              onClick={handleNext}
+              aria-label="Suivant"
+            >
+              <IonIcon icon={chevronForwardOutline} />
             </button>
           </div>
 
-          <div className="announce-card">
-            {loadingAd && !latestAd ? (
-              <div className="announce-image announce-loading">Chargement...</div>
-            ) : (
-              <img
-                src={(latestAd || fallbackAnnouncement).image}
-                alt="ESTIM App"
-                className="announce-image"
+          <div className="gallery-dots">
+            {galleryItems.map((item, index) => (
+              <span
+                key={item.year}
+                className={`gallery-dot ${index === activeIndex ? "active" : ""}`}
               />
-            )}
-            <div className="announce-body">
-              <div className="announce-text">
-                <p className="announce-title">
-                  {(latestAd || fallbackAnnouncement).title}
-                </p>
-                <p className="announce-desc">
-                  {(latestAd || fallbackAnnouncement).body}
-                </p>
-              </div>
-              <button className="announce-btn" onClick={() => history.push("/annonces")}>
-                Lire
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section className="section">
-          <div className="section-header">
-            <div>
-              <h2 className="section-title-upper">PROCHAINS COURS</h2>
-              <p className="section-subtitle">Decouvrez vos cours</p>
-            </div>
-          </div>
-
-          <div className="course-card">
-            <div className="course-top">
-              <p className="course-name">
-                {(nextCourse || fallbackCourse).title}
-              </p>
-              <img
-                src="/src/assets/icon/icon40x40.svg"
-                alt="Logo ESTIM"
-                className="course-logo"
-              />
-            </div>
-
-            <div className="course-info-row">
-              <IonIcon icon={timeOutline} className="course-icon" />
-              <span className="course-info-text">
-                {loadingCourse && !nextCourse
-                  ? "Chargement..."
-                  : (nextCourse || fallbackCourse).timeRange}
-              </span>
-            </div>
-
-            <div className="course-info-row">
-              <IonIcon icon={locationOutline} className="course-icon" />
-              <span className="course-info-text">
-                {loadingCourse && !nextCourse
-                  ? "Chargement..."
-                  : (nextCourse || fallbackCourse).salle}
-              </span>
-            </div>
+            ))}
           </div>
         </section>
 

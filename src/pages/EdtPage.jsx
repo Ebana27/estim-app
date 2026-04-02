@@ -9,9 +9,6 @@ const api = new EstimApi();
 
 // --- Helpers & Config ---
 const days = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
-const levelOptions = ['L1', 'L2', 'L3'];
-const typeOptions = ['Cours', 'Devoirs', 'Partielles'];
-const filiereOptions = ['GI', 'GEER', 'MI', 'TL', 'GRH', 'MQSE', 'CGE', 'BFA', 'COM', 'all'];
 
 const startOfWeekMonday = (date) => {
   const d = new Date(date);
@@ -29,6 +26,14 @@ const isSameDay = (a, b) => {
 };
 
 const mapCourse = (evt) => mapApiEdtToCourse(evt);
+const buildById = (items) => {
+  if (!Array.isArray(items)) return {};
+  return items.reduce((acc, item) => {
+    const id = item?.uuid || item?.id;
+    if (id) acc[id] = item;
+    return acc;
+  }, {});
+};
 
 const EdtPage = () => {
   const todayIndex = (new Date().getDay() + 6) % 7;
@@ -56,9 +61,35 @@ const EdtPage = () => {
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
-    api.getEdt()
-      .then((list) => {
-        if (isMounted) setCourses(list.map(mapCourse));
+    Promise.all([
+      api.getEdt(),
+      api.getCampus(),
+      api.getSemestres(),
+      api.getClasses(),
+      api.getSalles(),
+      api.getMatieres(),
+      api.getProfesseurs(),
+    ])
+      .then(([edtList, campusList, semestresList, classesList, sallesList, matieresList, profsList]) => {
+        if (!isMounted) return;
+        const campusById = buildById(campusList);
+        const semestresById = buildById(semestresList);
+        const classesById = buildById(classesList);
+        const sallesById = buildById(sallesList);
+        const matieresById = buildById(matieresList);
+        const profsById = buildById(profsList);
+
+        const enriched = (edtList || []).map((evt) => ({
+          ...evt,
+          campus: evt?.campusId ? campusById[evt.campusId] : evt?.campus,
+          semestre: evt?.semestreId ? semestresById[evt.semestreId] : evt?.semestre,
+          classe: evt?.classeId ? classesById[evt.classeId] : evt?.classe,
+          salle: evt?.salleId ? sallesById[evt.salleId] : evt?.salle,
+          matiere: evt?.matiereId ? matieresById[evt.matiereId] : evt?.matiere,
+          professeur: evt?.professeurId ? profsById[evt.professeurId] : evt?.professeur,
+        }));
+
+        setCourses(enriched.map(mapCourse));
       })
       .catch(console.error)
       .finally(() => { if (isMounted) setLoading(false) });

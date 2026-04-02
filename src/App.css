@@ -1,0 +1,173 @@
+/* Global onboarding overlay */
+.estim-onboard {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.18) 0 2px, transparent 2px 14px),
+    linear-gradient(300deg, rgba(255, 255, 255, 0.12) 0 2px, transparent 2px 16px),
+    #f6d56c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.estim-onboard__card {
+  position: relative;
+  width: min(360px, 90%);
+  background: #ffffff;
+  border-radius: 26px;
+  padding: 20px 18px 16px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.estim-onboard__card::before,
+.estim-onboard__card::after {
+  content: "";
+  position: absolute;
+  inset: -12px 14px 12px -14px;
+  border-radius: 26px;
+  background: #ffffff;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+  z-index: -1;
+}
+
+.estim-onboard__card::before {
+  transform: rotate(-6deg);
+  opacity: 0.7;
+}
+
+.estim-onboard__card::after {
+  inset: -6px -10px 6px 10px;
+  transform: rotate(6deg);
+  opacity: 0.6;
+}
+
+.estim-onboard__top {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.estim-onboard__skip {
+  background: #111827;
+  border: none;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.estim-onboard__media {
+  display: flex;
+  justify-content: center;
+}
+
+.estim-onboard__media img {
+  width: min(220px, 80%);
+  height: auto;
+  display: block;
+}
+
+.estim-onboard__content h2 {
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #0b0f17;
+}
+
+.estim-onboard__content p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+.estim-onboard__prefs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.estim-onboard__toggle {
+  background: transparent;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+.estim-onboard__toggle-box {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 2px solid #94a3b8;
+  display: inline-block;
+  position: relative;
+}
+
+.estim-onboard__toggle.is-active .estim-onboard__toggle-box {
+  border-color: #111827;
+  background: #111827;
+}
+
+.estim-onboard__toggle.is-active .estim-onboard__toggle-box::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 2px;
+  background: #ffffff;
+}
+
+.estim-onboard__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.estim-onboard__nav-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: #111827;
+  font-size: 22px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.estim-onboard__nav-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.estim-onboard__dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.estim-onboard__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.estim-onboard__dot.is-active {
+  width: 18px;
+  background: #111827;
+}

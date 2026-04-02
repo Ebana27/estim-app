@@ -43,6 +43,66 @@ class EstimApi {
       return [];
     }
   }
+
+  async getCampus(path = '/campus') {
+    try {
+      const data = await this.request(path);
+      return this.normalizeList(data);
+    } catch (error) {
+      console.error("Campus&Probleme lors de l'appel API ", error);
+      return [];
+    }
+  }
+
+  async getSemestres(path = '/semestres') {
+    try {
+      const data = await this.request(path);
+      return this.normalizeList(data);
+    } catch (error) {
+      console.error("Semestres&Probleme lors de l'appel API ", error);
+      return [];
+    }
+  }
+
+  async getClasses(path = '/classes') {
+    try {
+      const data = await this.request(path);
+      return this.normalizeList(data);
+    } catch (error) {
+      console.error("Classes&Probleme lors de l'appel API ", error);
+      return [];
+    }
+  }
+
+  async getSalles(path = '/salles') {
+    try {
+      const data = await this.request(path);
+      return this.normalizeList(data);
+    } catch (error) {
+      console.error("Salles&Probleme lors de l'appel API ", error);
+      return [];
+    }
+  }
+
+  async getMatieres(path = '/matieres') {
+    try {
+      const data = await this.request(path);
+      return this.normalizeList(data);
+    } catch (error) {
+      console.error("Matieres&Probleme lors de l'appel API ", error);
+      return [];
+    }
+  }
+
+  async getProfesseurs(path = '/professeurs') {
+    try {
+      const data = await this.request(path);
+      return this.normalizeList(data);
+    } catch (error) {
+      console.error("Professeurs&Probleme lors de l'appel API ", error);
+      return [];
+    }
+  }
 }
 
 export default EstimApi;
