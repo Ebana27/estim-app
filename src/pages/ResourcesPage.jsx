@@ -1,5 +1,5 @@
 import FeatureListPage from "./FeatureListPage";
-import { alertFunc } from "../utils/estimAlertFunc.js"
+import { alertFunc } from "../js/utils/estimAlertFunc.js"
 
 
 const Page = () => (
@@ -13,3 +13,4 @@ const Page = () => (
 );
 
 export default Page;
+

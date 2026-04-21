@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+Disallow: /private/
+
+# Service Worker
+Allow: /sw.js
+
+# PWA Files
+Allow: /manifest.json
+Allow: /.well-known/
+
+# Sitemap
+Sitemap: /sitemap.xml
+
+# Cache Control
+Cache-Control: max-age=3600
+
+# Allow crawling of static assets
+Allow: /assets/
+Allow: /icons/
+Allow: /public/

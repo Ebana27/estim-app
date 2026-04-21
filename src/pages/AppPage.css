@@ -1,4 +1,4 @@
-/* ================================================
+﻿/* ================================================
    ESTIM APP – AppPage.css
    ================================================ */
 
@@ -226,4 +226,54 @@
 IonPage {
   --margin: 10px;
   margin: 10px;
+}
+/* --- Notice modal --- */
+.feature-notice-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.feature-notice-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  border: none;
+}
+
+.feature-notice-card {
+  position: relative;
+  background: #fff;
+  width: min(520px, 92vw);
+  border-radius: 16px 16px 0 0;
+  padding: 20px 18px 24px;
+  box-shadow: 0 -8px 20px rgba(0,0,0,0.12);
+}
+
+.feature-notice-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #111;
+}
+
+.feature-notice-card p {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.feature-notice-close {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 10px;
+  font-weight: 800;
+  font-size: 14px;
+  background: #02F00E;
+  color: #041B08;
+  cursor: pointer;
 }

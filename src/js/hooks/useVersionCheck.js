@@ -21,6 +21,9 @@ const useVersionCheck = () => {
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const didNotifyRef = useRef(false);
 
+
+  // On demande la persmission au terminal et à l'utilisateur 
+  // pour autoriser les notificcations (Méthodes définies dans la doc capacitor notification)
   const requestNotificationPermission = async () => {
     try {
       await LocalNotifications.requestPermissions();
@@ -30,11 +33,15 @@ const useVersionCheck = () => {
     }
   };
 
+  // -----------------------------------------------------------------
+  // Fonctiion pour notifier l'utilisateur et le contenue de la notif
+  // -----------------------------------------------------------------
   const notifyUpdate = async (version) => {
     if (didNotifyRef.current) return;
     didNotifyRef.current = true;
     await requestNotificationPermission();
     try {
+      // Structure de la notification
       await LocalNotifications.schedule({
         notifications: [
           {
@@ -48,6 +55,7 @@ const useVersionCheck = () => {
         ],
       });
     } catch (err) {
+      // Alerte een console pour signifier que la structure n'est pas arriver malgrer la promesse
       console.warn("LocalNotifications schedule error:", err);
     }
   };

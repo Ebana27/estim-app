@@ -1,0 +1,66 @@
+{
+  "pwa": {
+    "name": "ESTIM App",
+    "shortName": "ESTIM",
+    "description": "Application de gestion scolaire ESTIM",
+    "version": "1.0.0",
+    "themeColor": "#3880ff",
+    "backgroundColor": "#ffffff",
+    "primaryColor": "#3880ff",
+    "secondaryColor": "#2dd4bf",
+    "accentColor": "#ff6b6b",
+    "iconPath": "/icons",
+    "splashPath": "/icons",
+    "categories": ["education", "productivity"],
+    "screenshots": {
+      "small": "540x720",
+      "large": "1280x720"
+    },
+    "orientation": "portrait-primary",
+    "display": "standalone",
+    "scope": "/",
+    "startUrl": "/",
+    "appLinks": {
+      "appID": "estim.app",
+      "paths": ["/*"]
+    },
+    "supportedLanguages": ["fr", "en"],
+    "supportedRegions": ["FR", "BE", "CH"],
+    "releaseDate": "2026-04-21",
+    "author": "ESTIM",
+    "license": "MIT",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/yourusername/estim-app"
+    },
+    "bugs": {
+      "url": "https://github.com/yourusername/estim-app/issues"
+    },
+    "homepage": "https://estim-app.com"
+  },
+  "security": {
+    "https": true,
+    "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'",
+    "permissions": [
+      "camera",
+      "microphone",
+      "geolocation",
+      "notifications",
+      "clipboard"
+    ]
+  },
+  "features": {
+    "offlineMode": true,
+    "pushNotifications": true,
+    "backgroundSync": true,
+    "periodicSync": true,
+    "fileSystem": true,
+    "serviceWorker": true
+  },
+  "build": {
+    "buildScript": "npm run build",
+    "outputDir": "dist",
+    "publicDir": "public",
+    "assetsDir": "assets"
+  }
+}

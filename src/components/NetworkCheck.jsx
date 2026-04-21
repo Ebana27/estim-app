@@ -51,15 +51,27 @@ const NetworkCheck = () => {
 
     getCurrentStatus();
 
-    const networkListener = Network.addListener("networkStatusChange", (status) => {
-      setIsConnected(status.connected);
-      setConnectionType(status.connectionType || "unknown");
-      setShowToast(true);
-    });
+    let listenerHandle = null;
+
+    const registerListener = async () => {
+      try {
+        listenerHandle = await Network.addListener("networkStatusChange", (status) => {
+          setIsConnected(status.connected);
+          setConnectionType(status.connectionType || "unknown");
+          setShowToast(true);
+        });
+      } catch (error) {
+        // Silently ignore if the plugin is unavailable (web without plugin).
+      }
+    };
+
+    registerListener();
 
     return () => {
       isMounted = false;
-      networkListener.remove();
+      if (listenerHandle && typeof listenerHandle.remove === "function") {
+        listenerHandle.remove();
+      }
     };
   }, []);
 

@@ -1,79 +1,75 @@
-/* src\theme\variables.css */
-/* ==========================================
-   ESTIM APP THEME - Style "Modern Clean"
-   ========================================== */
-
 :root {
-  /* --- Palette de Couleurs ESTIM --- */
   --estim-green: #117a2a;
   --estim-green-rgb: 17, 122, 42;
-  --estim-gold: #ffd036;
-  --estim-gold-rgb: 255, 208, 54;
+  --estim-gold: #FFE208;
+  --estim-gold-rgb: 255, 212, 0;
   --estim-black: #121212;
   --estim-white: #ffffff;
-  --estim-smoke: #f4f5f8; /* Gris très clair pour les fonds */
+  --estim-smoke: #fafafa;
+  --estim-tab-muted: #1f1f1f;
+  --estim-tab-border: #ece8df;
+  --estim-font-display: "Quicksand", "Helvetica", Arial, sans-serif;
+  --estim-font-text: "Helvetica", Arial, sans-serif;
+  --estim-btn-radius: 100px;
 
-  /* --- Ionic Primary Colors --- */
-  --ion-color-primary: var(--estim-green);
-  --ion-color-primary-rgb: var(--estim-green-rgb);
-  --ion-color-primary-contrast: var(--estim-white);
-  --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #0f6c25;
-  --ion-color-primary-tint: #29873f;
+  --ion-color-primary: var(--estim-gold);
+  --ion-color-primary-rgb: var(--estim-gold-rgb);
+  --ion-color-primary-contrast: var(--estim-black);
+  --ion-color-primary-contrast-rgb: 18, 18, 18;
+  --ion-color-primary-shade: #e2bb00;
+  --ion-color-primary-tint: #ffdb33;
 
-  --ion-color-secondary: var(--estim-gold);
-  --ion-color-secondary-rgb: var(--estim-gold-rgb);
-  --ion-color-secondary-contrast: var(--estim-black);
-  --ion-color-secondary-contrast-rgb: 0, 0, 0;
+  --ion-color-secondary: var(--estim-green);
+  --ion-color-secondary-rgb: var(--estim-green-rgb);
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
 
-  /* --- Arrière-plan global --- */
-  /* Fond général légèrement gris pour détacher les cartes blanches */
   --ion-background-color: var(--estim-smoke);
-  --ion-background-color-rgb: 244, 245, 248;
-
-  /* --- Texte --- */
+  --ion-background-color-rgb: 250, 250, 250;
   --ion-text-color: var(--estim-black);
   --ion-text-color-rgb: 18, 18, 18;
-
-  /* --- Toolbar (Barre du haut) --- */
-  /* Fond Blanc pour un look épuré, très moderne */
-  --ion-toolbar-background: var(--estim-white);
+  --ion-toolbar-background: transparent;
   --ion-toolbar-color: var(--estim-black);
-  --ion-toolbar-border-color: #e0e0e0; /* Ligne de séparation subtile en bas */
-
-  /* --- Tab Bar (Barre du bas) --- */
-  /* Fond Blanc, style natif iOS/Android moderne */
-  --ion-tab-bar-background: var(--estim-white);
-  --ion-tab-bar-color: #a0a0a0; /* Gris pour icônes inactives */
-  --ion-tab-bar-color-selected: var(--estim-green); /* Vert pour l'icône active */
-  --ion-tab-bar-border-color: #e0e0e0; /* Ligne subtile en haut */
-
-  /* --- Items (Listes & Cartes) --- */
-  /* Les items doivent être blancs pour ressortir sur le fond smoke */
-  --ion-item-background: var(--estim-white);
+  --ion-toolbar-border-color: transparent;
+  --ion-tab-bar-background: #ffffff;
+  --ion-tab-bar-color: var(--estim-tab-muted);
+  --ion-tab-bar-color-selected: var(--estim-gold);
+  --ion-tab-bar-border-color: var(--estim-tab-border);
+  --ion-item-background: #ffffff;
   --ion-item-border-color: transparent;
-
-  /* --- Inputs (Champs de saisie) --- */
   --ion-placeholder-color: #999999;
-
-  /* --- Bordures & Ombres (Vos contraintes) --- */
   --ion-border-color: transparent;
   --ion-box-shadow-color: transparent;
-  
-  /* --- Overlays (Alertes, Popups) --- */
-  --ion-overlay-background-color: var(--estim-white);
+  --ion-overlay-background-color: #ffffff;
   --ion-backdrop-color: var(--estim-black);
-  --ion-backdrop-opacity: 0.32; /* Opacité douce */
-
-  /* --- Variables Esthétiques --- */
-  --estim-btn-radius: 12px;
+  --ion-backdrop-opacity: 0.32;
 }
 
-/* ==========================================
-   STYLES DES COMPOSANTS
-   ========================================== */
+* {
+  box-sizing: border-box;
+}
 
-/* Boutons : Style moderne, bien arrondi, sans ombre dure */
+body,
+ion-app,
+ion-page,
+ion-content,
+ion-content::part(background) {
+  background: var(--estim-smoke);
+}
+
+ion-header,
+ion-toolbar {
+  --background: transparent;
+  --border-width: 0;
+  --box-shadow: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+ion-toolbar::part(container) {
+  background: transparent;
+}
+
 ion-button {
   --border-radius: var(--estim-btn-radius);
   --box-shadow: none;
@@ -81,78 +77,82 @@ ion-button {
   letter-spacing: 0.3px;
 }
 
-/* Bouton Principal (Vert) */
 ion-button[color="primary"] {
   --background: var(--estim-green);
   --background-hover: #0f6c25;
-  --color: var(--estim-white);
+  --color: #ffffff;
 }
 
-/* Bouton Secondaire (Doré/Jaune) - Idéal pour les CTA comme sur vos screenshots */
 ion-button[color="secondary"] {
   --background: var(--estim-gold);
   --color: var(--estim-black);
 }
 
-/* Bouton Transparent (Texte seulement) */
 ion-button[fill="clear"] {
   --color: var(--estim-green);
 }
 
-/* Inputs : Style "Material Design" flat */
 ion-item.item-has-focus {
   --highlight-background: var(--estim-green);
 }
 
-/* ==========================================
-   AJUSTEMENTS PLATEFORME (iOS/MD)
-   ========================================== */
-
-:root.ios {
-  --ion-toolbar-border-color: transparent; /* iOS a souvent des bordures transparentes par défaut */
-  /* Forcer le style sur iOS pour unifier */
-  --ion-toolbar-background: var(--estim-white);
-}
-
-:root.md {
-  --ion-toolbar-border-color: transparent;
-}
-
-/* Effet de survol très subtil (Ripple) */
 ion-item::part(native) {
   --ripple-color: rgba(17, 122, 42, 0.1);
 }
 
-/* ================================================
-   ESTIM APP – estim.css (Styles globaux)
-   À importer dans App.jsx
-   ================================================ */
+:root.ios,
+:root.md {
+  --ion-toolbar-background: transparent;
+  --ion-toolbar-border-color: transparent;
+}
 
-/* ── Tab Bar globale ── */
 ion-tab-bar {
-  --background: var(--estim-white);
-  --border: 1px solid #e0e0e0;
-  height: 64px;
-  padding-bottom: env(safe-area-inset-bottom);
+  --background: #ffffff;
+  --border: none;
+  background: #ffffff;
+  border-top: 1px solid var(--estim-tab-border);
+  box-shadow: 0 -8px 24px rgba(18, 18, 18, 0.06);
+  height: 76px;
+  padding: 8px 12px env(safe-area-inset-bottom);
 }
 
 ion-tab-button {
-  --color: #a0a0a0;
-  --color-selected: var(--estim-green);
-  font-size: 10px;
+  --color: var(--estim-tab-muted);
+  --color-selected: var(--estim-gold);
+  min-height: 60px;
+  font-size: 12px;
   font-weight: 700;
-}
-
-ion-tab-button ion-icon {
-  font-size: 22px;
+  text-transform: none;
 }
 
 ion-tab-button ion-label {
-  font-size: 10px;
+  margin-top: 6px;
+  font-size: 12px;
   font-weight: 700;
+  font-family: var(--estim-font-display);
 }
 
-/* ── Ripple vert au tap ── */
+.tab-icon-image {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  display: block;
+  filter: grayscale(1) brightness(0.1);
+}
+
+ion-tab-button.tab-selected .tab-icon-image,
+ion-tab-button.tab-selected ion-label {
+  filter: none;
+}
+
+.tab-icon-home {
+  filter: none;
+}
+
+.tab-icon-profile {
+  border-radius: 50%;
+}
+
 ion-tab-button::part(native) {
-  --ripple-color: rgba(17, 122, 42, 0.1);
+  --ripple-color: rgba(255, 212, 0, 0.18);
 }

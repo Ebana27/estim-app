@@ -44,6 +44,16 @@ export const mapApiEdtToCourse = (evt) => {
   const prof = evt?.professeur?.nom || evt?.professeur || evt?.prof;
   const salle = evt?.salle?.nom || evt?.salle || evt?.room;
   const rawDate = evt?.dateHeure || evt?.startAt || evt?.date;
+  const level =
+    evt?.classe?.niveau?.code ||
+    evt?.classe?.niveau?.libelle ||
+    evt?.classe?.niveau?.label ||
+    undefined;
+  const filiere =
+    evt?.classe?.filiere?.sigle ||
+    evt?.classe?.filiere?.nom ||
+    evt?.classe?.nom ||
+    undefined;
 
   return {
     id: evt?.uuid || evt?.id || `${matiere}-${rawDate}`,
@@ -53,8 +63,21 @@ export const mapApiEdtToCourse = (evt) => {
     prof,
     salle,
     rawDate,
-    level: evt?.classe?.niveau?.code,
-    filiere: evt?.classe?.filiere?.sigle,
+    level,
+    filiere,
     typeLabel: evt?.type || evt?.typeLabel,
+    typeKey: String(evt?.type || evt?.typeLabel || '').toLowerCase(),
+    campusId: evt?.campusId || evt?.campus?.uuid || evt?.campus?.id,
+    semestreId: evt?.semestreId || evt?.semestre?.uuid || evt?.semestre?.id,
+    classeId: evt?.classeId || evt?.classe?.uuid || evt?.classe?.id,
+    salleId: evt?.salleId || evt?.salle?.uuid || evt?.salle?.id,
+    matiereId: evt?.matiereId || evt?.matiere?.uuid || evt?.matiere?.id,
+    professeurId: evt?.professeurId || evt?.professeur?.uuid || evt?.professeur?.id,
+    campus: evt?.campus,
+    semestre: evt?.semestre,
+    classe: evt?.classe,
+    matiere: evt?.matiere,
+    professeur: evt?.professeur,
+    salleObj: evt?.salle,
   };
 };

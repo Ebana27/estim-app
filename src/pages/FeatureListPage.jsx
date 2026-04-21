@@ -6,8 +6,8 @@ import {
   IonToolbar,
   IonTitle,
 } from "@ionic/react";
-import EstimApi from "../api/estimApi";
-import { formatDateShortFr, formatTimeFr } from "../utils/estimMappers";
+import EstimApi from "../js/api/estimApi";
+import { formatDateShortFr, formatTimeFr } from "../js/utils/estimMappers";
 import "./FeatureListPage.css";
 
 const api = new EstimApi();
@@ -111,3 +111,4 @@ const FeatureListPage = ({ title, subtitle, endpoint, emptyLabel }) => {
 };
 
 export default FeatureListPage;
+

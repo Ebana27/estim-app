@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+﻿import React, { useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import {
   IonContent,
@@ -13,7 +13,6 @@ import "./AppPage.css";
 
 // ──────────────────────────────────────────────────────────────────
 // Images Unsplash – une image pertinente par fonctionnalité
-// Tu peux les remplacer par tes propres assets locaux plus tard
 // ──────────────────────────────────────────────────────────────────
 const IMAGES = {
   // Académique
@@ -56,7 +55,7 @@ const FEATURE_SECTIONS = [
         btnColor: "#FFE057",
         btnTextColor: "#333",
         image: IMAGES.ABSENCES,
-        available: true,
+        available: false,
         route: "/absences",
       },
     ],
@@ -72,7 +71,7 @@ const FEATURE_SECTIONS = [
         btnColor: "#fff",
         btnTextColor: "#1a7a34",
         image: IMAGES.BIBLIO,
-        available: true,
+        available: false,
         route: "/bibliotheque",
       },
       {
@@ -80,10 +79,10 @@ const FEATURE_SECTIONS = [
         subtitle: "Cours & documents",
         buttonText: "Ouvrir",
         bgColor: "#15622a",
-        btnColor: "#FFE057",
-        btnTextColor: "#333",
+        btnColor: "#fff",
+        btnTextColor: "#1a7a34",
         image: IMAGES.RESSOURCES,
-        available: true,
+        available: false,
         route: "/ressources",
       },
     ],
@@ -99,7 +98,7 @@ const FEATURE_SECTIONS = [
         btnColor: "#FF6352",
         btnTextColor: "#fff",
         image: IMAGES.PRESENCE,
-        available: true,
+        available: false,
         route: "/presence",
       },
       {
@@ -107,10 +106,10 @@ const FEATURE_SECTIONS = [
         subtitle: "Consulter vos résultats",
         buttonText: "Voir",
         bgColor: "#8a2020",
-        btnColor: "#FFE057",
-        btnTextColor: "#333",
+        btnColor: "#FF6352",
+        btnTextColor: "#fff",
         image: IMAGES.NOTES,
-        available: true,
+        available: false,
         route: "/notes",
       },
     ],
@@ -126,7 +125,7 @@ const FEATURE_SECTIONS = [
         btnColor: "#52b1ff",
         btnTextColor: "#fff",
         image: IMAGES.BDE,
-        available: true,
+        available: false,
         route: "/bde",
       },
       {
@@ -137,7 +136,7 @@ const FEATURE_SECTIONS = [
         btnColor: "#52b1ff",
         btnTextColor: "#fff",
         image: IMAGES.CHAT,
-        available: true,
+        available: false,
         route: "/estim-chat",
       },
     ],
@@ -158,9 +157,13 @@ const FeatureCard = ({
   available = true,
   route,
   onOpen,
+  onUnavailable,
 }) => {
   const handleClick = () => {
-    if (!available || !route) return;
+    if (!available || !route) {
+      if (!available && onUnavailable) onUnavailable();
+      return;
+    }
     onOpen(route);
   };
 
@@ -218,6 +221,10 @@ const FeatureCard = ({
 const AppPage = () => {
   const history = useHistory();
   const [query, setQuery] = useState("");
+  const [isNoticeOpen, setIsNoticeOpen] = useState(false);
+
+  const openNotice = () => setIsNoticeOpen(true);
+  const closeNotice = () => setIsNoticeOpen(false);
 
   const filteredSections = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -269,6 +276,7 @@ const AppPage = () => {
                   key={item.title}
                   {...item}
                   onOpen={(route) => history.push(route)}
+                  onUnavailable={openNotice}
                 />
               ))}
             </div>
@@ -287,6 +295,17 @@ const AppPage = () => {
         ))}
 
         <div style={{ height: 32 }} />
+
+        {isNoticeOpen && (
+          <div className="feature-notice-modal">
+            <button className="feature-notice-backdrop" onClick={closeNotice} aria-label="Fermer" />
+            <div className="feature-notice-card" role="dialog" aria-modal="true">
+              <h3>Information</h3>
+              <p>Pas encore disponible sur les fonctionnalités en développement.</p>
+              <button type="button" className="feature-notice-close" onClick={closeNotice}>Fermer</button>
+            </div>
+          </div>
+        )}
       </IonContent>
     </IonPage>
   );

@@ -1,228 +1,319 @@
 import { useEffect, useMemo, useState } from 'react';
-import { IonContent, IonPage, IonIcon } from '@ionic/react';
-import { ellipsisVertical, timeOutline, locationOutline } from 'ionicons/icons';
-import EstimApi from '../api/estimApi';
-import { mapApiEdtToCourse } from '../utils/estimMappers';
+import {
+  IonContent,
+  IonIcon,
+  IonPage,
+  IonRefresher,
+  IonRefresherContent,
+} from '@ionic/react';
+import { chevronDownOutline } from 'ionicons/icons';
+import EstimApi from '../js/api/estimApi';
+import {
+  DAY_LABELS,
+  DAY_ORDER,
+  buildById,
+  getDefaultOpenDay,
+  getTodayDayKey,
+  normalizeWeeklyCourses,
+} from '../js/utils/weeklyEdt';
 import './EdtPage.css';
 
 const api = new EstimApi();
 
-// --- Helpers & Config ---
-const days = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
-
-const startOfWeekMonday = (date) => {
-  const d = new Date(date);
-  const day = (d.getDay() + 6) % 7;
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() - day);
-  return d;
+const uniqueValuesInOrder = (items) => {
+  const seen = new Set();
+  return items.filter((item) => {
+    if (!item || seen.has(item)) return false;
+    seen.add(item);
+    return true;
+  });
 };
 
-const isSameDay = (a, b) => {
-  if (!a || !b) return false;
-  const da = new Date(a);
-  const db = new Date(b);
-  return da.getFullYear() === db.getFullYear() && da.getMonth() === db.getMonth() && da.getDate() === db.getDate();
+const sortLevels = (levels) => {
+  return [...levels].sort((left, right) => {
+    const leftRank = Number(String(left).match(/\d+/)?.[0] || Number.POSITIVE_INFINITY);
+    const rightRank = Number(String(right).match(/\d+/)?.[0] || Number.POSITIVE_INFINITY);
+
+    if (leftRank !== rightRank) return leftRank - rightRank;
+    return String(left).localeCompare(String(right), 'fr');
+  });
 };
 
-const mapCourse = (evt) => mapApiEdtToCourse(evt);
-const buildById = (items) => {
-  if (!Array.isArray(items)) return {};
-  return items.reduce((acc, item) => {
-    const id = item?.uuid || item?.id;
-    if (id) acc[id] = item;
-    return acc;
-  }, {});
+const readOptionalList = (result) => {
+  if (result.status === 'fulfilled') return api.normalizeList(result.value);
+  console.warn('Weekly EDT lookup unavailable:', result.reason);
+  return [];
+};
+
+const fetchWeeklyEdtData = async () => {
+  const [
+    edtResult,
+    classesResult,
+    sallesResult,
+    matieresResult,
+    profsResult,
+  ] = await Promise.allSettled([
+    api.request('/edt'),
+    api.request('/classes'),
+    api.request('/salles'),
+    api.request('/matieres'),
+    api.request('/professeurs'),
+  ]);
+
+  if (edtResult.status !== 'fulfilled') {
+    throw edtResult.reason || new Error('Impossible de charger les emplois du temps.');
+  }
+
+  const edtList = api.normalizeList(edtResult.value);
+  const classesList = readOptionalList(classesResult);
+  const sallesList = readOptionalList(sallesResult);
+  const matieresList = readOptionalList(matieresResult);
+  const profsList = readOptionalList(profsResult);
+
+  return normalizeWeeklyCourses(edtList, {
+    classesById: buildById(classesList),
+    sallesById: buildById(sallesList),
+    matieresById: buildById(matieresList),
+    profsById: buildById(profsList),
+  });
 };
 
 const EdtPage = () => {
-  const todayIndex = (new Date().getDay() + 6) % 7;
-  const [activeDay, setActiveDay] = useState(todayIndex);
   const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  
-  // États filtres (simplifiés pour l'exemple)
-  const [selectedLevel, setSelectedLevel] = useState('L1');
-  const [selectedType, setSelectedType] = useState('Cours');
-  const [selectedFiliere, setSelectedFiliere] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [selectedFiliere, setSelectedFiliere] = useState('');
+  const [selectedLevel, setSelectedLevel] = useState('Tous');
+  const [openDay, setOpenDay] = useState(getTodayDayKey());
 
-  const weekDates = useMemo(() => {
-    const monday = startOfWeekMonday(new Date());
-    return Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(monday);
-      d.setDate(monday.getDate() + i);
-      return d;
-    });
-  }, []);
+  const loadCourses = async () => {
+    setLoading(true);
+    setError('');
 
-  const dates = useMemo(() => weekDates.map((d) => d.getDate()), [weekDates]);
+    try {
+      const nextCourses = await fetchWeeklyEdtData();
+      setCourses(nextCourses);
+    } catch (err) {
+      console.error(err);
+      setCourses([]);
+      setError('Impossible de charger l’emploi du temps pour le moment.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
-    setLoading(true);
-    Promise.all([
-      api.getEdt(),
-      api.getCampus(),
-      api.getSemestres(),
-      api.getClasses(),
-      api.getSalles(),
-      api.getMatieres(),
-      api.getProfesseurs(),
-    ])
-      .then(([edtList, campusList, semestresList, classesList, sallesList, matieresList, profsList]) => {
+
+    const load = async () => {
+      setLoading(true);
+      setError('');
+
+      try {
+        const nextCourses = await fetchWeeklyEdtData();
         if (!isMounted) return;
-        const campusById = buildById(campusList);
-        const semestresById = buildById(semestresList);
-        const classesById = buildById(classesList);
-        const sallesById = buildById(sallesList);
-        const matieresById = buildById(matieresList);
-        const profsById = buildById(profsList);
+        setCourses(nextCourses);
+      } catch (err) {
+        console.error(err);
+        if (!isMounted) return;
+        setCourses([]);
+        setError('Impossible de charger l’emploi du temps pour le moment.');
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
 
-        const enriched = (edtList || []).map((evt) => ({
-          ...evt,
-          campus: evt?.campusId ? campusById[evt.campusId] : evt?.campus,
-          semestre: evt?.semestreId ? semestresById[evt.semestreId] : evt?.semestre,
-          classe: evt?.classeId ? classesById[evt.classeId] : evt?.classe,
-          salle: evt?.salleId ? sallesById[evt.salleId] : evt?.salle,
-          matiere: evt?.matiereId ? matieresById[evt.matiereId] : evt?.matiere,
-          professeur: evt?.professeurId ? profsById[evt.professeurId] : evt?.professeur,
-        }));
-
-        setCourses(enriched.map(mapCourse));
-      })
-      .catch(console.error)
-      .finally(() => { if (isMounted) setLoading(false) });
-    return () => { isMounted = false; };
+    load();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const selectedDate = weekDates[activeDay];
+  const handleRefresh = async (event) => {
+    await loadCourses();
+    event.detail.complete();
+  };
 
-  const dailyCourses = useMemo(() => {
-    if (!selectedDate) return [];
-    return courses
-      .filter((course) => isSameDay(course.rawDate, selectedDate))
-      .sort((a, b) => new Date(a.rawDate) - new Date(b.rawDate));
-  }, [courses, selectedDate]);
+  const filiereOptions = useMemo(() => {
+    return uniqueValuesInOrder(courses.map((course) => course.filiere));
+  }, [courses]);
+
+  useEffect(() => {
+    if (filiereOptions.length === 0) {
+      if (selectedFiliere !== '') setSelectedFiliere('');
+      return;
+    }
+
+    if (!selectedFiliere || !filiereOptions.includes(selectedFiliere)) {
+      setSelectedFiliere(filiereOptions[0]);
+    }
+  }, [filiereOptions, selectedFiliere]);
+
+  const coursesForSelectedFiliere = useMemo(() => {
+    if (!selectedFiliere) return [];
+    return courses.filter((course) => course.filiere === selectedFiliere);
+  }, [courses, selectedFiliere]);
+
+  const levelOptions = useMemo(() => {
+    return sortLevels(
+      uniqueValuesInOrder(coursesForSelectedFiliere.map((course) => course.level).filter(Boolean)),
+    );
+  }, [coursesForSelectedFiliere]);
+
+  useEffect(() => {
+    if (levelOptions.length === 0) {
+      if (selectedLevel !== 'Tous') setSelectedLevel('Tous');
+      return;
+    }
+
+    if (selectedLevel !== 'Tous' && !levelOptions.includes(selectedLevel)) {
+      setSelectedLevel('Tous');
+    }
+  }, [levelOptions, selectedLevel]);
+
+  const filteredCourses = useMemo(() => {
+    if (selectedLevel === 'Tous') return coursesForSelectedFiliere;
+    return coursesForSelectedFiliere.filter((course) => course.level === selectedLevel);
+  }, [coursesForSelectedFiliere, selectedLevel]);
+
+  const groupedDays = useMemo(() => {
+    return DAY_ORDER.map((dayKey) => ({
+      key: dayKey,
+      label: DAY_LABELS[dayKey],
+      courses: filteredCourses.filter((course) => course.dayKey === dayKey),
+    }));
+  }, [filteredCourses]);
+
+  useEffect(() => {
+    setOpenDay((current) => {
+      const preferredDay = current || getTodayDayKey();
+      const nextDay = getDefaultOpenDay(groupedDays, preferredDay);
+      return current === nextDay ? current : nextDay;
+    });
+  }, [groupedDays]);
+
+  const hasCoursesForCurrentFilters = groupedDays.some((day) => day.courses.length > 0);
 
   return (
     <IonPage>
-      <IonContent className="edt-content">
-        
-        {/* ══════════════════════════════════
-            HEADER (Titre + Menu)
-        ══════════════════════════════════ */}
-        <div className="edt-header">
-            <div className="edt-header-left">
-                <h1 className="edt-title">Emploi du temps</h1>
-            </div>
-            <div className="edt-header-right">
-                {/* Menu points verticaux */}
-                <button className="edt-menu-btn">
-                    <IonIcon icon={ellipsisVertical} />
-                </button>
-            </div>
-        </div>
+      <IonContent className="edt-content" fullscreen>
+        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent />
+        </IonRefresher>
 
-        {/* ══════════════════════════════════
-            SÉLECTEUR DE SEMAINE
-        ══════════════════════════════════ */}
-        <div className="edt-week-selector">
-          <div className="edt-week-container">
-            {days.map((day, i) => (
-              <div key={i} className="edt-day-col">
-                <span className="edt-day-label">{day}</span>
+        <div className="edt-shell">
+          <header className="edt-header">
+            <h1 className="edt-title">Emploi du Temps</h1>
+          </header>
+
+          <section className="edt-toolbar" aria-label="Filtres emploi du temps">
+            <label className="edt-select-card" htmlFor="edt-filiere-select">
+              <span className="edt-select-prefix">Filière:</span>
+              <select
+                id="edt-filiere-select"
+                className="edt-select-control"
+                value={selectedFiliere}
+                onChange={(event) => setSelectedFiliere(event.target.value)}
+                disabled={loading || filiereOptions.length === 0}
+                aria-label="Choisir une filière"
+              >
+                {filiereOptions.length === 0 && (
+                  <option value="">
+                    {loading ? 'Chargement...' : 'Aucune filière disponible'}
+                  </option>
+                )}
+                {filiereOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+              <IonIcon icon={chevronDownOutline} className="edt-select-icon" aria-hidden="true" />
+            </label>
+
+            {levelOptions.length > 0 && (
+              <div className="edt-levels" aria-label="Filtrer par niveau">
                 <button
-                  className={`edt-day-num ${activeDay === i ? 'is-active' : ''}`}
-                  onClick={() => setActiveDay(i)}
+                  type="button"
+                  className={`edt-level-chip ${selectedLevel === 'Tous' ? 'is-active' : ''}`}
+                  onClick={() => setSelectedLevel('Tous')}
                 >
-                  {dates[i]}
+                  Tous
                 </button>
+                {levelOptions.map((level) => (
+                  <button
+                    key={level}
+                    type="button"
+                    className={`edt-level-chip ${selectedLevel === level ? 'is-active' : ''}`}
+                    onClick={() => setSelectedLevel(level)}
+                  >
+                    {level}
+                  </button>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
+            )}
+          </section>
 
-        {/* ══════════════════════════════════
-            CONTENU PRINCIPAL (Time + Cards)
-        ══════════════════════════════════ */}
-        <div className="edt-body">
-            
-            {/* -- Bouton Filtrer (Flottant Jaune) -- */}
-            <button className="edt-filter-float-btn" onClick={() => setIsFilterOpen(true)}>
-                <span>Filtrer</span>
-                <div className="edt-filter-bars">
-                    <span /><span /><span />
-                </div>
-            </button>
+          {loading && <div className="edt-state-card">Chargement de l’emploi du temps...</div>}
+          {!loading && error && <div className="edt-state-card edt-state-card--error">{error}</div>}
+          {!loading && !error && !selectedFiliere && (
+            <div className="edt-state-card">Aucun emploi du temps disponible.</div>
+          )}
+          {!loading && !error && selectedFiliere && !hasCoursesForCurrentFilters && (
+            <div className="edt-state-card">Aucun cours pour cette filière.</div>
+          )}
 
-            {/* -- Timeline Container -- */}
-            <div className="edt-timeline-wrapper">
-                {/* Barre de temps gauche */}
-                <div className="edt-time-rail">
-                    <div className="edt-time-marker">07H30</div>
-                    <div className="edt-time-marker">09H00</div>
-                    <div className="edt-time-marker">10H30</div>
-                    <div className="edt-time-marker">12H00</div>
-                </div>
+          {!error && selectedFiliere && (
+            <div className="edt-days-list">
+              {groupedDays.map((day) => {
+                const hasCourses = day.courses.length > 0;
+                const isOpen = hasCourses && openDay === day.key;
 
-                {/* Liste des cours */}
-                <div className="edt-courses-list">
-                    {loading && <div className="edt-loading">Chargement...</div>}
-                    
-                    {!loading && dailyCourses.map((course, index) => (
-                        <div key={course.id} className="edt-card-wrapper">
-                            {/* Point vert actif si premier cours */}
-                            {index === 0 && <div className="edt-active-dot" />}
-                            
-                            <div className="edt-course-card">
-                                <div className="edt-card-header">
-                                    <span className="edt-card-time">{course.timeRange}</span>
-                                    <span className="edt-card-type">{course.typeLabel}</span>
-                                </div>
-                                <h3 className="edt-card-title">{course.title}</h3>
-                                <div className="edt-card-info">
-                                    <div className="edt-info-item">
-                                        <IonIcon icon={timeOutline} />
-                                        <span>{course.time}</span>
-                                    </div>
-                                    <div className="edt-info-item">
-                                        <IonIcon icon={locationOutline} />
-                                        <span>{course.salle || 'Salle non définie'}</span>
-                                    </div>
-                                </div>
-                                <div className="edt-card-prof">
-                                    {course.prof}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                return (
+                  <section
+                    key={day.key}
+                    className={`edt-day-card ${isOpen ? 'is-open' : ''} ${!hasCourses ? 'is-empty' : ''}`}
+                  >
+                    <button
+                      type="button"
+                      className="edt-day-toggle"
+                      onClick={() => {
+                        if (hasCourses) setOpenDay(day.key);
+                      }}
+                      disabled={!hasCourses}
+                      aria-expanded={isOpen}
+                    >
+                      <span className="edt-day-name">{day.label}</span>
+                    </button>
+
+                    {isOpen && (
+                      <div className="edt-day-body">
+                        {day.courses.map((course) => (
+                          <article key={course.id} className="edt-course-row">
+                            <p className="edt-course-line">
+                              <span className="edt-course-time">{course.timeRange}</span>
+                              <span className="edt-course-separator"> : </span>
+                              <span className="edt-course-subject">{course.subject}</span>
+                              {course.room && (
+                                <span className="edt-course-room"> ({course.room})</span>
+                              )}
+                            </p>
+                            {course.teacher && (
+                              <p className="edt-course-teacher">{course.teacher}</p>
+                            )}
+                          </article>
+                        ))}
+                      </div>
+                    )}
+                  </section>
+                );
+              })}
             </div>
+          )}
         </div>
-
-        {/* ══════════════════════════════════
-            MODAL FILTRES (Garde ton ancien code modal ici)
-        ══════════════════════════════════ */}
-        {isFilterOpen && (
-             <div id="plan-filter-modal" className="estim-plan-filter">
-             <button
-               id="plan-filter-backdrop"
-               className="estim-plan-filter__backdrop"
-               onClick={() => setIsFilterOpen(false)}
-             />
-             <section className="estim-plan-filter__panel">
-                {/* ... Contenu de ton modal filtre ... */}
-                <button onClick={() => setIsFilterOpen(false)}>Fermer</button>
-             </section>
-           </div>
-        )}
-
       </IonContent>
     </IonPage>
   );
 };
 
 export default EdtPage;
-
-

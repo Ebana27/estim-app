@@ -12,7 +12,11 @@
     "lint": "eslint",
     "capacitor:assets": "capacitor-assets generate",
     "capacitor:sync": "capacitor sync",
-    "capacitor:build": "capacitor build android"
+    "capacitor:build": "capacitor build android",
+    "capacitor:build:ios": "capacitor build ios",
+    "capacitor:open:ios": "capacitor open ios",
+    "pwa:build": "npm run build && npm run capacitor:sync",
+    "pwa:generate-icons": "powershell -File scripts/generate-pwa-icons.ps1 -SourceImage ./icons/source.png"
   },
   "dependencies": {
     "@capacitor/android": "8.2.0",
@@ -25,6 +29,7 @@
     "@capacitor/local-notifications": "^8.0.2",
     "@capacitor/network": "^8.0.1",
     "@capacitor/status-bar": "8.0.1",
+    "@fontsource/quicksand": "^5.2.10",
     "@ionic/react": "^8.5.0",
     "@ionic/react-router": "^8.5.0",
     "@types/react-router": "^5.1.20",

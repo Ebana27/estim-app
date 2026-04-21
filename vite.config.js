@@ -11,6 +11,36 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: './src/setupTests.js',
-  }
+    setupFiles: './src/js/setupTests.js',
+  },
+  server: {
+    // Configuration du serveur de développement
+    headers: {
+      'Service-Worker-Allowed': '/',
+      'Cache-Control': 'no-cache',
+    },
+    mimeTypes: {
+      'application/json': ['json'],
+      'image/webp': ['webp'],
+    },
+  },
+  build: {
+    // Configuration de build
+    rollupOptions: {
+      output: {
+        // Optimiser le chunking
+        manualChunks: {
+          'vendor': ['react', 'react-dom'],
+          'ionic': ['@ionic/react'],
+        },
+      },
+    },
+    // Assurer que manifest.json et sw.js ne sont pas hashés
+    assetsDir: 'assets',
+    manifest: false,
+  },
+  // Configuration pour les assets PWA
+  publicDir: 'public',
 })
+
+

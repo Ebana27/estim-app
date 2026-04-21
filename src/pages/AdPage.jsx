@@ -1,8 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
+import { LocalNotifications } from '@capacitor/local-notifications';
 import {
   IonContent,
   IonHeader,
   IonPage,
+  IonRefresher,
+  IonRefresherContent,
   IonToolbar,
   IonSearchbar,
   IonIcon,
@@ -10,12 +13,13 @@ import {
 import { closeOutline, checkmarkCircleOutline } from 'ionicons/icons';
 
 import studentImage from '../assets/img/student.svg';
-import EstimApi from '../api/estimApi';
-import { mapApiAdToAnnouncement } from '../utils/estimMappers';
+import EstimApi from '../js/api/estimApi';
+import { mapApiAdToAnnouncement } from '../js/utils/estimMappers';
 import './AdPage.css';
 
 const api = new EstimApi();
 const CACHE_KEY = 'estim_ads_cache';
+const ADS_NOTIFIED_KEY = 'estim_ads_notified';
 
 // --- Données fictives (Fallback ultime) ---
 const fallbackImage = studentImage;
@@ -60,6 +64,64 @@ const categoryLabels = {
 
 // --- Helpers ---
 const mapAd = (ad) => mapApiAdToAnnouncement(ad, fallbackImage);
+const isFallbackAnnouncementImage = (image) => {
+  if (!image) return true;
+  return image === fallbackImage;
+};
+
+const shouldShowModalImage = (item) => {
+  return Boolean(item?.image) && !isFallbackAnnouncementImage(item.image);
+};
+
+const requestAdNotificationPermission = async () => {
+  try {
+    await LocalNotifications.requestPermissions();
+    return true;
+  } catch (err) {
+    console.warn('LocalNotifications permission error:', err);
+    return false;
+  }
+};
+
+const loadNotifiedAds = () => {
+  try {
+    const raw = localStorage.getItem(ADS_NOTIFIED_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return new Set(parsed);
+  } catch (err) {
+    console.warn('Ads notified cache read error', err);
+  }
+  return new Set();
+};
+
+const saveNotifiedAds = (set) => {
+  try {
+    localStorage.setItem(ADS_NOTIFIED_KEY, JSON.stringify(Array.from(set)));
+  } catch (err) {
+    console.warn('Ads notified cache write error', err);
+  }
+};
+
+const scheduleAdNotifications = async (list) => {
+  if (!Array.isArray(list) || list.length === 0) return;
+  const ok = await requestAdNotificationPermission();
+  if (!ok) return;
+
+  const base = Date.now() + 1500;
+  const notifications = list.map((ad, index) => ({
+    id: Math.abs((ad?.id || index).toString().split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0)) + base + index,
+    title: ad?.title || 'Nouvelle annonce',
+    body: (ad?.body || '').slice(0, 120),
+    schedule: { at: new Date(base + index * 1000) },
+  }));
+
+  try {
+    await LocalNotifications.schedule({ notifications });
+  } catch (err) {
+    console.warn('LocalNotifications schedule error:', err);
+  }
+};
 
 // --- Composants ---
 
@@ -94,8 +156,8 @@ const AnnouncementCard = ({ item, onClick }) => {
 const AnnouncementModal = ({ item, onClose }) => {
   if (!item) return null;
 
-  // Contenu spécifique pour la démonstration ESTIM APP (selon l'image)
   const isEstimApp = item.title.includes('ESTIM APP');
+  const hasModalImage = shouldShowModalImage(item);
   const features = [
     "Lecture D'emploi Du Temps",
     "Annonce & Evenements",
@@ -113,7 +175,13 @@ const AnnouncementModal = ({ item, onClose }) => {
           </button>
         </div>
 
-        <div className="ann-modal-content">
+        {hasModalImage && (
+          <div className="ann-modal-media">
+            <img className="ann-modal-image" src={item.image} alt={item.title} />
+          </div>
+        )}
+
+        <div className={`ann-modal-content ${hasModalImage ? 'ann-modal-content--with-image' : ''}`}>
           <h2 className="ann-modal-title">{item.title}</h2>
           <p className="ann-modal-desc">
             {isEstimApp 
@@ -151,46 +219,88 @@ const AdPage = () => {
   const [search, setSearch] = useState('');
   const [selectedAd, setSelectedAd] = useState(null);
 
-  // 1. Chargement initial (Cache puis API)
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadData = async () => {
-      // A. Essayer de charger le cache immédiatement
+  const loadAnnouncements = async ({ isMounted = () => true, skipCache = false } = {}) => {
+    if (!skipCache) {
       try {
         const cached = localStorage.getItem(CACHE_KEY);
         if (cached) {
           const parsed = JSON.parse(cached);
-          if (isMounted) setAnnouncements(parsed);
+          if (Array.isArray(parsed) && isMounted()) {
+            setAnnouncements(parsed);
+          }
         }
       } catch (e) {
         console.warn('Erreur lecture cache', e);
       }
+    }
 
-      // B. Appel API
+    let cachedIds = new Set();
+    let notifiedIds = loadNotifiedAds();
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) {
+          cachedIds = new Set(parsed.map((item) => item?.id).filter(Boolean));
+        }
+      }
+    } catch (e) {
+      console.warn('Erreur lecture cache', e);
+    }
+
+    try {
+      const list = await api.getAd();
+      const mapped = list.map(mapAd);
+      const newOnes = mapped.filter((ad) => {
+        const isNew = ad?.isNew === true || !cachedIds.has(ad?.id);
+        return isNew && !notifiedIds.has(ad?.id);
+      });
+
+      if (newOnes.length > 0) {
+        await scheduleAdNotifications(newOnes);
+        newOnes.forEach((ad) => notifiedIds.add(ad?.id));
+        saveNotifiedAds(notifiedIds);
+      }
+
+      if (isMounted()) {
+        setAnnouncements(mapped);
+        localStorage.setItem(CACHE_KEY, JSON.stringify(mapped));
+      }
+      return mapped;
+    } catch (err) {
+      console.error('Échec API Annonces', err);
+      if (isMounted() && !localStorage.getItem(CACHE_KEY)) {
+        setAnnouncements(mockAnnouncements);
+      }
+      return [];
+    }
+  };
+
+  // 1. Chargement initial (Cache puis API)
+  useEffect(() => {
+    let mounted = true;
+
+    const loadData = async () => {
+      setLoading(true);
       try {
-        const list = await api.getAd();
-        const mapped = list.map(mapAd);
-        if (isMounted) {
-          setAnnouncements(mapped);
-          // Sauvegarder dans le cache
-          localStorage.setItem(CACHE_KEY, JSON.stringify(mapped));
-        }
-      } catch (err) {
-        console.error('Échec API Annonces', err);
-        // Si pas de cache et erreur, on utilise les mocks
-        if (isMounted && announcements.length === 0) {
-          setAnnouncements(mockAnnouncements);
-        }
+        await loadAnnouncements({ isMounted: () => mounted });
       } finally {
-        if (isMounted) setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
 
     loadData();
 
-    return () => { isMounted = false; };
+    return () => { mounted = false; };
   }, []);
+
+  const handleRefresh = async (event) => {
+    try {
+      await loadAnnouncements({ skipCache: true });
+    } finally {
+      event.detail.complete();
+    }
+  };
 
   // 2. Filtres
   const filtered = useMemo(() => {
@@ -216,6 +326,10 @@ const AdPage = () => {
       </IonHeader>
 
       <IonContent className="tab3-content">
+        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent />
+        </IonRefresher>
+
         {/* Searchbar */}
         <div className="search-container">
           <IonSearchbar
@@ -244,7 +358,7 @@ const AdPage = () => {
           {loading && announcements.length === 0 && (
             <div className="ann-loading">Chargement...</div>
           )}
-          
+
           {filtered.map((a) => (
             <AnnouncementCard key={a.id} item={a} onClick={setSelectedAd} />
           ))}
@@ -260,3 +374,4 @@ const AdPage = () => {
 };
 
 export default AdPage;
+
