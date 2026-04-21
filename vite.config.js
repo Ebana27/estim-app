@@ -28,10 +28,17 @@ export default defineConfig({
     // Configuration de build
     rollupOptions: {
       output: {
-        // Optimiser le chunking
-        manualChunks: {
-          'vendor': ['react', 'react-dom'],
-          'ionic': ['@ionic/react'],
+        // Optimiser le chunking avec une fonction
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react')) {
+              return 'vendor-react';
+            }
+            if (id.includes('@ionic')) {
+              return 'vendor-ionic';
+            }
+            return 'vendor';
+          }
         },
       },
     },
