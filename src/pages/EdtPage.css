@@ -70,31 +70,6 @@
   pointer-events: none;
 }
 
-.edt-levels {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.edt-level-chip {
-  min-height: 38px;
-  padding: 0 16px;
-  border: 1px solid rgba(41, 46, 58, 0.12);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
-  color: #656c78;
-  font-size: 0.94rem;
-  font-weight: 700;
-  box-shadow: 0 6px 16px rgba(25, 33, 61, 0.06);
-}
-
-.edt-level-chip.is-active {
-  border-color: #e0b800;
-  background: #ffd91a;
-  color: #1d1f24;
-  box-shadow: 0 12px 24px rgba(255, 217, 26, 0.24);
-}
-
 .edt-state-card {
   margin-bottom: 22px;
   padding: 18px 20px;
@@ -208,5 +183,59 @@
 
   .edt-day-body {
     padding: 22px 24px 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .edt-shell {
+    padding: 18px 14px 36px;
+  }
+
+  .edt-toolbar {
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .edt-select-card {
+    min-height: 74px;
+    border-radius: 18px;
+    padding: 0 56px 0 14px;
+  }
+
+  .edt-select-prefix {
+    font-size: 0.88rem;
+  }
+
+  .edt-select-control {
+    font-size: 1.1rem;
+  }
+
+  .edt-day-toggle {
+    min-height: 88px;
+    padding: 0 14px;
+  }
+
+  .edt-day-body {
+    padding: 14px 14px 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .edt-day-name {
+    font-size: clamp(1.55rem, 8vw, 2.1rem);
+  }
+
+  .edt-course-line {
+    font-size: 0.98rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .edt-shell {
+    max-width: 1040px;
+  }
+
+  .edt-days-list {
+    gap: 18px;
   }
 }

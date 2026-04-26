@@ -1,198 +1,191 @@
-import { useEffect, useMemo, useState } from 'react';
-import {
-  IonContent,
-  IonIcon,
-  IonPage,
-  IonRefresher,
-  IonRefresherContent,
-} from '@ionic/react';
-import { chevronDownOutline } from 'ionicons/icons';
-import EstimApi from '../js/api/estimApi';
-import {
-  DAY_LABELS,
-  DAY_ORDER,
-  buildById,
-  getDefaultOpenDay,
-  getTodayDayKey,
-  normalizeWeeklyCourses,
-} from '../js/utils/weeklyEdt';
-import './EdtPage.css';
+import { useEffect, useMemo, useState } from "react";
+import { IonContent, IonIcon, IonPage, IonRefresher, IonRefresherContent } from "@ionic/react";
+import { chevronDownOutline } from "ionicons/icons";
+import EstimApi from "../js/api/estimApi";
+import { buildById, DAY_ORDER, getDefaultOpenDay, normalizeWeeklyCourses } from "../js/utils/weeklyEdt";
+import "./EdtPage.css";
 
 const api = new EstimApi();
+const ALL_LEVELS_OPTION = "Tous";
+const LEVEL_ORDER = ["L1", "L2", "L3", "L4", "M1", "M2"];
 
-const uniqueValuesInOrder = (items) => {
-  const seen = new Set();
-  return items.filter((item) => {
-    if (!item || seen.has(item)) return false;
-    seen.add(item);
-    return true;
+const uniq = (items) => [...new Set((items || []).filter(Boolean))];
+
+const orderLevels = (levels) => {
+  const unique = uniq(levels);
+  return unique.sort((a, b) => {
+    const aIndex = LEVEL_ORDER.indexOf(a);
+    const bIndex = LEVEL_ORDER.indexOf(b);
+    if (aIndex !== -1 || bIndex !== -1) {
+      return (aIndex === -1 ? Number.POSITIVE_INFINITY : aIndex) - (bIndex === -1 ? Number.POSITIVE_INFINITY : bIndex);
+    }
+    return a.localeCompare(b, "fr");
   });
 };
 
-const sortLevels = (levels) => {
-  return [...levels].sort((left, right) => {
-    const leftRank = Number(String(left).match(/\d+/)?.[0] || Number.POSITIVE_INFINITY);
-    const rightRank = Number(String(right).match(/\d+/)?.[0] || Number.POSITIVE_INFINITY);
-
-    if (leftRank !== rightRank) return leftRank - rightRank;
-    return String(left).localeCompare(String(right), 'fr');
-  });
-};
-
-const readOptionalList = (result) => {
-  if (result.status === 'fulfilled') return api.normalizeList(result.value);
-  console.warn('Weekly EDT lookup unavailable:', result.reason);
-  return [];
-};
-
-const fetchWeeklyEdtData = async () => {
-  const [
-    edtResult,
-    classesResult,
-    sallesResult,
-    matieresResult,
-    profsResult,
-  ] = await Promise.allSettled([
-    api.request('/edt'),
-    api.request('/classes'),
-    api.request('/salles'),
-    api.request('/matieres'),
-    api.request('/professeurs'),
-  ]);
-
-  if (edtResult.status !== 'fulfilled') {
-    throw edtResult.reason || new Error('Impossible de charger les emplois du temps.');
+const unwrapList = async (path) => {
+  const payload = await api.request(path);
+  if (payload?.ok === false) {
+    throw new Error(payload?.message || `Erreur API (${path})`);
   }
+  return api.normalizeList(payload);
+};
 
-  const edtList = api.normalizeList(edtResult.value);
-  const classesList = readOptionalList(classesResult);
-  const sallesList = readOptionalList(sallesResult);
-  const matieresList = readOptionalList(matieresResult);
-  const profsList = readOptionalList(profsResult);
+const buildFiliereLevelIndex = ({ classes = [], courses = [] }) => {
+  const filiereLevels = new Map();
 
-  return normalizeWeeklyCourses(edtList, {
-    classesById: buildById(classesList),
-    sallesById: buildById(sallesList),
-    matieresById: buildById(matieresList),
-    profsById: buildById(profsList),
+  const add = (filiere, level) => {
+    if (!filiere) return;
+    if (!filiereLevels.has(filiere)) filiereLevels.set(filiere, new Set());
+    if (level) filiereLevels.get(filiere).add(level);
+  };
+
+  classes.forEach((classe) => {
+    const filiere = classe?.filiere?.sigle || classe?.filiere?.nom || classe?.nom || null;
+    const level = typeof classe?.niveau === "string" ? classe.niveau : (classe?.niveau?.code || null);
+    add(filiere, level);
+  });
+
+  courses.forEach((course) => {
+    add(course?.filiere, course?.level);
+  });
+
+  const filieres = Array.from(filiereLevels.keys()).sort((a, b) => a.localeCompare(b, "fr"));
+  const filieresWithLevels = filieres.filter((f) => (filiereLevels.get(f)?.size || 0) > 0);
+
+  return { filiereLevels, filieres, filieresWithLevels };
+};
+
+const groupCoursesByDay = (courses) => {
+  const byDay = new Map();
+  (courses || []).forEach((course) => {
+    if (!course?.dayKey) return;
+    if (!byDay.has(course.dayKey)) byDay.set(course.dayKey, []);
+    byDay.get(course.dayKey).push(course);
+  });
+
+  return DAY_ORDER.map((dayKey) => {
+    const dayCourses = (byDay.get(dayKey) || []).slice().sort((a, b) => a.startHour - b.startHour);
+    return { key: dayKey, label: dayKey, courses: dayCourses };
   });
 };
 
 const EdtPage = () => {
-  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [selectedFiliere, setSelectedFiliere] = useState('');
-  const [selectedLevel, setSelectedLevel] = useState('Tous');
-  const [openDay, setOpenDay] = useState(getTodayDayKey());
+  const [error, setError] = useState("");
+  const [events, setEvents] = useState([]);
+  const [lookups, setLookups] = useState({ classesById: {}, sallesById: {}, matieresById: {}, profsById: {} });
 
-  const loadCourses = async () => {
+  const [selectedFiliere, setSelectedFiliere] = useState("");
+  const [selectedLevel, setSelectedLevel] = useState(ALL_LEVELS_OPTION);
+  const [openDay, setOpenDay] = useState("");
+
+  const loadData = async () => {
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const nextCourses = await fetchWeeklyEdtData();
-      setCourses(nextCourses);
+      const [edt, classes, matieres, salles, professeurs] = await Promise.all([
+        unwrapList("/edt"),
+        unwrapList("/classes").catch(() => []),
+        unwrapList("/matieres").catch(() => []),
+        unwrapList("/salles").catch(() => []),
+        unwrapList("/professeurs").catch(() => []),
+      ]);
+
+      setEvents(edt);
+      setLookups({
+        classesById: buildById(classes),
+        sallesById: buildById(salles),
+        matieresById: buildById(matieres),
+        profsById: buildById(professeurs),
+      });
     } catch (err) {
       console.error(err);
-      setCourses([]);
-      setError('Impossible de charger l’emploi du temps pour le moment.');
+      setEvents([]);
+      setLookups({ classesById: {}, sallesById: {}, matieresById: {}, profsById: {} });
+      setError("Impossible de charger l'emploi du temps pour le moment.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    let isMounted = true;
-
-    const load = async () => {
-      setLoading(true);
-      setError('');
-
-      try {
-        const nextCourses = await fetchWeeklyEdtData();
-        if (!isMounted) return;
-        setCourses(nextCourses);
-      } catch (err) {
-        console.error(err);
-        if (!isMounted) return;
-        setCourses([]);
-        setError('Impossible de charger l’emploi du temps pour le moment.');
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    load();
-    return () => {
-      isMounted = false;
-    };
+    loadData();
   }, []);
 
   const handleRefresh = async (event) => {
-    await loadCourses();
+    await loadData();
     event.detail.complete();
   };
 
-  const filiereOptions = useMemo(() => {
-    return uniqueValuesInOrder(courses.map((course) => course.filiere));
-  }, [courses]);
+  const weeklyCourses = useMemo(() => normalizeWeeklyCourses(events, lookups), [events, lookups]);
 
-  useEffect(() => {
-    if (filiereOptions.length === 0) {
-      if (selectedFiliere !== '') setSelectedFiliere('');
-      return;
-    }
+  const { filiereLevels, filieres, filieresWithLevels } = useMemo(() => {
+    const classes = Object.values(lookups?.classesById || {});
+    return buildFiliereLevelIndex({ classes, courses: weeklyCourses });
+  }, [lookups, weeklyCourses]);
 
-    if (!selectedFiliere || !filiereOptions.includes(selectedFiliere)) {
-      setSelectedFiliere(filiereOptions[0]);
-    }
-  }, [filiereOptions, selectedFiliere]);
+  const canUseLevels = filieresWithLevels.length > 0;
 
-  const coursesForSelectedFiliere = useMemo(() => {
-    if (!selectedFiliere) return [];
-    return courses.filter((course) => course.filiere === selectedFiliere);
-  }, [courses, selectedFiliere]);
+  const availableLevelsForSelectedFiliere = useMemo(() => {
+    return orderLevels(Array.from(filiereLevels.get(selectedFiliere) || []));
+  }, [filiereLevels, selectedFiliere]);
 
   const levelOptions = useMemo(() => {
-    return sortLevels(
-      uniqueValuesInOrder(coursesForSelectedFiliere.map((course) => course.level).filter(Boolean)),
-    );
-  }, [coursesForSelectedFiliere]);
+    if (!canUseLevels) return [];
+    return [ALL_LEVELS_OPTION, ...availableLevelsForSelectedFiliere];
+  }, [availableLevelsForSelectedFiliere, canUseLevels]);
 
   useEffect(() => {
-    if (levelOptions.length === 0) {
-      if (selectedLevel !== 'Tous') setSelectedLevel('Tous');
+    if (filieres.length === 0) {
+      setSelectedFiliere("");
       return;
     }
 
-    if (selectedLevel !== 'Tous' && !levelOptions.includes(selectedLevel)) {
-      setSelectedLevel('Tous');
+    const defaultFiliere = filieresWithLevels[0] || filieres[0];
+    if (!selectedFiliere || !filieres.includes(selectedFiliere)) {
+      setSelectedFiliere(defaultFiliere);
+      setSelectedLevel(ALL_LEVELS_OPTION);
+      return;
     }
-  }, [levelOptions, selectedLevel]);
 
-  const filteredCourses = useMemo(() => {
-    if (selectedLevel === 'Tous') return coursesForSelectedFiliere;
-    return coursesForSelectedFiliere.filter((course) => course.level === selectedLevel);
-  }, [coursesForSelectedFiliere, selectedLevel]);
+    if (!canUseLevels) return;
 
-  const groupedDays = useMemo(() => {
-    return DAY_ORDER.map((dayKey) => ({
-      key: dayKey,
-      label: DAY_LABELS[dayKey],
-      courses: filteredCourses.filter((course) => course.dayKey === dayKey),
-    }));
-  }, [filteredCourses]);
+    const selectedLevels = filiereLevels.get(selectedFiliere);
+    const hasLevels = (selectedLevels?.size || 0) > 0;
+    if (!hasLevels) {
+      setSelectedFiliere(defaultFiliere);
+      setSelectedLevel(ALL_LEVELS_OPTION);
+    }
+  }, [canUseLevels, filiereLevels, filieres, filieresWithLevels, selectedFiliere]);
 
   useEffect(() => {
-    setOpenDay((current) => {
-      const preferredDay = current || getTodayDayKey();
-      const nextDay = getDefaultOpenDay(groupedDays, preferredDay);
-      return current === nextDay ? current : nextDay;
+    if (!canUseLevels) return;
+    if (!levelOptions.includes(selectedLevel)) setSelectedLevel(ALL_LEVELS_OPTION);
+  }, [canUseLevels, levelOptions, selectedLevel]);
+
+  const filteredCourses = useMemo(() => {
+    if (!selectedFiliere) return [];
+    if (!canUseLevels) return [];
+
+    let filtered = weeklyCourses.filter((course) => course.filiere === selectedFiliere);
+    if (canUseLevels && selectedLevel !== ALL_LEVELS_OPTION) {
+      filtered = filtered.filter((course) => course.level === selectedLevel);
+    }
+    return filtered;
+  }, [canUseLevels, selectedFiliere, selectedLevel, weeklyCourses]);
+
+  const groupedDays = useMemo(() => groupCoursesByDay(filteredCourses), [filteredCourses]);
+  const hasCourses = groupedDays.some((day) => day.courses.length > 0);
+
+  useEffect(() => {
+    setOpenDay((previous) => {
+      const available = groupedDays.filter((day) => day.courses.length > 0).map((day) => day.key);
+      if (previous && available.includes(previous)) return previous;
+      return getDefaultOpenDay(groupedDays);
     });
   }, [groupedDays]);
-
-  const hasCoursesForCurrentFilters = groupedDays.some((day) => day.courses.length > 0);
 
   return (
     <IonPage>
@@ -212,17 +205,13 @@ const EdtPage = () => {
               <select
                 id="edt-filiere-select"
                 className="edt-select-control"
-                value={selectedFiliere}
-                onChange={(event) => setSelectedFiliere(event.target.value)}
-                disabled={loading || filiereOptions.length === 0}
                 aria-label="Choisir une filière"
+                value={selectedFiliere}
+                onChange={(e) => setSelectedFiliere(e.target.value)}
+                disabled={loading || filieres.length === 0}
               >
-                {filiereOptions.length === 0 && (
-                  <option value="">
-                    {loading ? 'Chargement...' : 'Aucune filière disponible'}
-                  </option>
-                )}
-                {filiereOptions.map((option) => (
+                {filieres.length === 0 && <option value="">{loading ? "Chargement..." : "Aucune filière"}</option>}
+                {filieres.map((option) => (
                   <option key={option} value={option}>
                     {option}
                   </option>
@@ -231,56 +220,52 @@ const EdtPage = () => {
               <IonIcon icon={chevronDownOutline} className="edt-select-icon" aria-hidden="true" />
             </label>
 
-            {levelOptions.length > 0 && (
-              <div className="edt-levels" aria-label="Filtrer par niveau">
-                <button
-                  type="button"
-                  className={`edt-level-chip ${selectedLevel === 'Tous' ? 'is-active' : ''}`}
-                  onClick={() => setSelectedLevel('Tous')}
-                >
-                  Tous
-                </button>
-                {levelOptions.map((level) => (
-                  <button
-                    key={level}
-                    type="button"
-                    className={`edt-level-chip ${selectedLevel === level ? 'is-active' : ''}`}
-                    onClick={() => setSelectedLevel(level)}
-                  >
-                    {level}
-                  </button>
-                ))}
-              </div>
-            )}
+            <label className="edt-select-card" htmlFor="edt-level-select">
+              <span className="edt-select-prefix">Niveau:</span>
+              <select
+                id="edt-level-select"
+                className="edt-select-control"
+                aria-label="Choisir un niveau"
+                value={selectedLevel}
+                onChange={(e) => setSelectedLevel(e.target.value)}
+                disabled={loading || !canUseLevels || levelOptions.length === 0}
+              >
+                {!canUseLevels && <option value={ALL_LEVELS_OPTION}>{ALL_LEVELS_OPTION}</option>}
+                {canUseLevels &&
+                  levelOptions.map((level) => (
+                    <option key={level} value={level}>
+                      {level}
+                    </option>
+                  ))}
+              </select>
+              <IonIcon icon={chevronDownOutline} className="edt-select-icon" aria-hidden="true" />
+            </label>
           </section>
 
-          {loading && <div className="edt-state-card">Chargement de l’emploi du temps...</div>}
+          {loading && <div className="edt-state-card">Chargement...</div>}
           {!loading && error && <div className="edt-state-card edt-state-card--error">{error}</div>}
-          {!loading && !error && !selectedFiliere && (
-            <div className="edt-state-card">Aucun emploi du temps disponible.</div>
-          )}
-          {!loading && !error && selectedFiliere && !hasCoursesForCurrentFilters && (
+          {!loading && !error && selectedFiliere && !hasCourses && (
             <div className="edt-state-card">Aucun cours pour cette filière.</div>
           )}
 
-          {!error && selectedFiliere && (
+          {!loading && !error && selectedFiliere && (
             <div className="edt-days-list">
               {groupedDays.map((day) => {
-                const hasCourses = day.courses.length > 0;
-                const isOpen = hasCourses && openDay === day.key;
+                const isNotEmpty = day.courses.length > 0;
+                const isOpen = isNotEmpty && openDay === day.key;
 
                 return (
                   <section
                     key={day.key}
-                    className={`edt-day-card ${isOpen ? 'is-open' : ''} ${!hasCourses ? 'is-empty' : ''}`}
+                    className={`edt-day-card ${isOpen ? "is-open" : ""} ${!isNotEmpty ? "is-empty" : ""}`}
                   >
                     <button
                       type="button"
                       className="edt-day-toggle"
                       onClick={() => {
-                        if (hasCourses) setOpenDay(day.key);
+                        if (isNotEmpty) setOpenDay(day.key);
                       }}
-                      disabled={!hasCourses}
+                      disabled={!isNotEmpty}
                       aria-expanded={isOpen}
                     >
                       <span className="edt-day-name">{day.label}</span>
@@ -294,13 +279,9 @@ const EdtPage = () => {
                               <span className="edt-course-time">{course.timeRange}</span>
                               <span className="edt-course-separator"> : </span>
                               <span className="edt-course-subject">{course.subject}</span>
-                              {course.room && (
-                                <span className="edt-course-room"> ({course.room})</span>
-                              )}
+                              {course.room && <span className="edt-course-room"> ({course.room})</span>}
                             </p>
-                            {course.teacher && (
-                              <p className="edt-course-teacher">{course.teacher}</p>
-                            )}
+                            {course.teacher && <p className="edt-course-teacher">{course.teacher}</p>}
                           </article>
                         ))}
                       </div>

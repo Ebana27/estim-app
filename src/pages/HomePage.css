@@ -1,7 +1,22 @@
-@import "../theme/variables.css";
+﻿@import "../theme/variables.css";
 
 .home-page-content::part(background) {
   background: #fafafa;
+}
+
+.home-page-header,
+.home-page-header ion-toolbar,
+.home-page-toolbar {
+  --border-width: 0 !important;
+  --box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.home-page-header::after,
+.home-page-header ion-toolbar::after,
+.home-page-toolbar::after {
+  display: none !important;
+  content: none !important;
 }
 
 .home-page-shell {
@@ -23,7 +38,7 @@
   margin: 0;
   color: #111111;
   font-family: var(--estim-font-display);
-  font-size: 28px;
+  font-size: clamp(30px, 6.2vw, 34px);
   font-weight: 800;
   letter-spacing: -0.04em;
 }
@@ -411,15 +426,17 @@
 @media (max-width: 480px) {
   .home-page-shell {
     padding-top: 2px;
+    padding-bottom: 110px;
   }
 
   .edt-header {
     padding-top: 20px;
+    padding-inline: 16px;
   }
 
   .home-page-greeting,
   .home-page-student {
-    font-size: 24px;
+    font-size: 26px;
   }
 
   .home-section-title {
@@ -442,5 +459,89 @@
 
   .quick-action-label {
     font-size: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .home-page-shell {
+    padding-bottom: 100px;
+  }
+
+  .home-page-hero {
+    padding: 8px 14px 14px;
+  }
+
+  .home-section {
+    padding: 0 12px;
+    margin-top: 20px;
+  }
+
+  .home-section-title {
+    margin-bottom: 14px;
+    font-size: 18px;
+  }
+
+  .quick-actions-grid {
+    gap: 20px 10px;
+  }
+
+  .quick-action-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .quick-action-label {
+    min-height: 32px;
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 768px) {
+  .home-page-shell {
+    max-width: 960px;
+    padding: 24px 24px 140px;
+  }
+
+  .edt-header {
+    padding: 12px 8px 8px;
+  }
+
+  .home-page-hero {
+    padding: 20px 8px 24px;
+  }
+
+  .home-page-greeting,
+  .home-page-student {
+    font-size: clamp(32px, 4.2vw, 44px);
+  }
+
+  .home-section {
+    padding: 0 8px;
+    margin-top: 30px;
+  }
+
+  .home-section-title {
+    font-size: 26px;
+  }
+
+  .discovery-stage {
+    min-height: 230px;
+  }
+
+  .discovery-phone-wrap {
+    max-width: 300px;
+  }
+
+  .discovery-students-wrap {
+    max-width: 260px;
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 26px 18px;
+  }
+
+  .quick-action-label {
+    font-size: 15px;
   }
 }

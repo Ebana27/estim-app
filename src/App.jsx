@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Redirect, Route, useLocation } from "react-router-dom";
 import {
   IonApp,
@@ -20,10 +20,12 @@ import AbsencePage from "./pages/AbsencePage";
 import LibraryPage from "./pages/LibraryPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import PresencePage from "./pages/PresencePage";
-import NotesPage from "./pages/NotesPage";
+import ExamensPage from "./pages/ExamensPage";
 import OnboardingPage from "./pages/OnboardingPage";
 
 import NetworkCheck from "./components/NetworkCheck";
+import IOSInstallPrompt from "./components/IOSInstallPrompt";
+import { IOSInstallProvider } from "./js/context/IOSInstallContext";
 
 import "@ionic/react/css/core.css";
 import "@ionic/react/css/normalize.css";
@@ -82,7 +84,8 @@ const AppRoutes = ({ shouldShowOnboarding, onOnboardingDone }) => {
             <Route exact path="/bibliotheque">{guard(<LibraryPage />)}</Route>
             <Route exact path="/ressources">{guard(<ResourcesPage />)}</Route>
             <Route exact path="/presence">{guard(<PresencePage />)}</Route>
-            <Route exact path="/notes">{guard(<NotesPage />)}</Route>
+            <Route exact path="/examens">{guard(<ExamensPage />)}</Route>
+            <Route exact path="/notes">{guard(<ExamensPage />)}</Route>
           </IonRouterOutlet>
 
           <IonTabBar slot="bottom">
@@ -128,12 +131,15 @@ const App = () => {
   };
 
   return (
-    <IonApp>
-      <NetworkCheck />
-      <IonReactRouter>
-        <AppRoutes shouldShowOnboarding={showOnboarding} onOnboardingDone={handleOnboardingDone} />
-      </IonReactRouter>
-    </IonApp>
+    <IOSInstallProvider>
+      <IonApp>
+        <IOSInstallPrompt />
+        <NetworkCheck />
+        <IonReactRouter>
+          <AppRoutes shouldShowOnboarding={showOnboarding} onOnboardingDone={handleOnboardingDone} />
+        </IonReactRouter>
+      </IonApp>
+    </IOSInstallProvider>
   );
 };
 

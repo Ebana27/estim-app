@@ -1,311 +1,196 @@
-﻿import React, { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { IonContent, IonHeader, IonPage, IonToast, IonToolbar } from "@ionic/react";
 import {
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-  IonIcon,
-} from "@ionic/react";
-import { searchOutline, chevronForwardOutline } from "ionicons/icons";
+  MdAccountCircle,
+  MdArrowForward,
+  MdCalendarMonth,
+  MdCampaign,
+  MdChatBubbleOutline,
+  MdPayments,
+  MdHowToReg,
+  MdSchedule,
+  MdSchool,
+} from "react-icons/md";
+
+import StudentsImage from "../assets/img/students.png";
 import "./AppPage.css";
 
-// ──────────────────────────────────────────────────────────────────
-// Images Unsplash – une image pertinente par fonctionnalité
-// ──────────────────────────────────────────────────────────────────
-const IMAGES = {
-  // Académique
-  EDT:         "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=400&q=70",   // calendrier / agenda
-  ABSENCES:    "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&q=70",   // salle de classe vide
-
-  // Ressources
-  BIBLIO:      "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=70",   // bibliothèque
-  RESSOURCES:  "https://images.unsplash.com/photo-1513258496099-48168024aec0?w=400&q=70",   // documents / cours
-
-  // Suivi
-  PRESENCE:    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=70",   // scan / pointage
-  NOTES:       "https://images.unsplash.com/photo-1588072432836-e10032774350?w=400&q=70",   // notes / résultats
-
-  // Communauté
-  BDE:         "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&q=70",   // groupe d'étudiants
-  CHAT:        "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&q=70",      // discussion / chat
-};
-
-const FEATURE_SECTIONS = [
+const APPS = [
   {
-    label: "ACADEMIQUE",
-    items: [
-      {
-        title: "EMPLOI DU TEMPS",
-        subtitle: "Consultez votre planning",
-        buttonText: "Consulter",
-        bgColor: "#b8860b",
-        btnColor: "#FFE057",
-        btnTextColor: "#333",
-        image: IMAGES.EDT,
-        available: true,
-        route: "/edt",
-      },
-      {
-        title: "ABSENCES",
-        subtitle: "Justifier vos absences",
-        buttonText: "Voir",
-        bgColor: "#8a6500",
-        btnColor: "#FFE057",
-        btnTextColor: "#333",
-        image: IMAGES.ABSENCES,
-        available: false,
-        route: "/absences",
-      },
-    ],
+    key: "calendar",
+    title: "Calendrier",
+    description: "Consultez vos événements et emplois du temps.",
+    icon: MdCalendarMonth,
+    route: "/edt",
+    available: true,
+    variant: "accent",
+    size: "hero",
   },
   {
-    label: "RESSOURCES",
-    items: [
-      {
-        title: "BIBLIOTHÈQUE",
-        subtitle: "Références et documents",
-        buttonText: "Lire",
-        bgColor: "#1a7a34",
-        btnColor: "#fff",
-        btnTextColor: "#1a7a34",
-        image: IMAGES.BIBLIO,
-        available: false,
-        route: "/bibliotheque",
-      },
-      {
-        title: "RESSOURCES",
-        subtitle: "Cours & documents",
-        buttonText: "Ouvrir",
-        bgColor: "#15622a",
-        btnColor: "#fff",
-        btnTextColor: "#1a7a34",
-        image: IMAGES.RESSOURCES,
-        available: false,
-        route: "/ressources",
-      },
-    ],
+    key: "hero-image",
+    kind: "image",
+    image: StudentsImage,
+    alt: "Illustration ESTIM",
+    size: "hero",
   },
   {
-    label: "SUIVI",
-    items: [
-      {
-        title: "PRÉSENCE",
-        subtitle: "Marquer votre présence",
-        buttonText: "Scan",
-        bgColor: "#b03030",
-        btnColor: "#FF6352",
-        btnTextColor: "#fff",
-        image: IMAGES.PRESENCE,
-        available: false,
-        route: "/presence",
-      },
-      {
-        title: "NOTES",
-        subtitle: "Consulter vos résultats",
-        buttonText: "Voir",
-        bgColor: "#8a2020",
-        btnColor: "#FF6352",
-        btnTextColor: "#fff",
-        image: IMAGES.NOTES,
-        available: false,
-        route: "/notes",
-      },
-    ],
+    key: "edt",
+    title: "Emploi du temps",
+    description: "Accédez à votre planning de cours.",
+    icon: MdSchedule,
+    route: "/edt",
+    available: true,
   },
   {
-    label: "COMMUNAUTÉ",
-    items: [
-      {
-        title: "BDE",
-        subtitle: "Déposer vos plaintes",
-        buttonText: "Déposer",
-        bgColor: "#1a5fa0",
-        btnColor: "#52b1ff",
-        btnTextColor: "#fff",
-        image: IMAGES.BDE,
-        available: false,
-        route: "/bde",
-      },
-      {
-        title: "ESTIM CHAT",
-        subtitle: "Chater avec la communauté",
-        buttonText: "Chater",
-        bgColor: "#154d82",
-        btnColor: "#52b1ff",
-        btnTextColor: "#fff",
-        image: IMAGES.CHAT,
-        available: false,
-        route: "/estim-chat",
-      },
-    ],
+    key: "annonces",
+    title: "Annonces",
+    description: "Restez informé des dernières nouvelles.",
+    icon: MdCampaign,
+    route: "/annonces",
+    available: true,
+  },
+  {
+    key: "examens",
+    title: "Examens",
+    description: "Consultez vos examens et résultats.",
+    icon: MdSchool,
+    route: "/examens",
+    available: true,
+  },
+  {
+    key: "chat",
+    title: "Chat",
+    description: "Discutez avec vos camarades et enseignants.",
+    icon: MdChatBubbleOutline,
+    route: "/estim-chat",
+    available: false,
+    span: 2,
+  },
+  {
+    key: "finances",
+    title: "Finances",
+    description: "Gérez vos paiements.",
+    icon: MdPayments,
+    route: "/finances",
+    available: false,
+  },
+  {
+    key: "presence",
+    title: "Présence",
+    description: "Suivez vos présences.",
+    icon: MdHowToReg,
+    route: "/presence",
+    available: false,
+  },
+  {
+    key: "profil",
+    title: "Profil",
+    description: "Gérez vos informations personnelles.",
+    icon: MdAccountCircle,
+    route: "/profile",
+    available: false,
+    span: 2,
   },
 ];
 
-/* ================================================
-   COMPOSANT : FeatureCard  (carte carrée)
-   ================================================ */
-const FeatureCard = ({
-  title,
-  subtitle,
-  buttonText,
-  bgColor,
-  btnColor,
-  btnTextColor,
-  image,
-  available = true,
-  route,
-  onOpen,
-  onUnavailable,
-}) => {
-  const handleClick = () => {
-    if (!available || !route) {
-      if (!available && onUnavailable) onUnavailable();
-      return;
-    }
-    onOpen(route);
-  };
+const AppTile = ({ item, onOpen, onUnavailable }) => {
+  if (item.kind === "image") {
+    return (
+      <div className="apps-hero-image" aria-label={item.alt}>
+        <img className="apps-hero-image-img" src={item.image} alt={item.alt} />
+      </div>
+    );
+  }
+
+  const Icon = item.icon || MdSchedule;
+  const isHero = item.size === "hero";
+  const disabled = !item.available || !item.route;
+  const className = [
+    "apps-tile",
+    isHero ? "apps-tile--hero" : "apps-tile--mini",
+    item.variant === "accent" ? "apps-tile--accent" : "",
+    item.span === 2 ? "apps-tile--span2" : "",
+    disabled ? "is-disabled" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <div className="feature-card" onClick={handleClick}>
-
-      {/* ── Image de fond (peu opaque) ── */}
-      <img src={image} alt={title} className="feature-card-bg" />
-
-      {/* ── Couche de couleur par-dessus l'image ── */}
-      <div
-        className="feature-card-color-layer"
-        style={{ background: bgColor }}
-      />
-
-      {/* ── Dégradé sombre en bas pour lisibilité ── */}
-      <div className="feature-card-fade" />
-
-      {/* ── Badge "bientôt disponible" ── */}
-      {!available && (
-        <div className="coming-soon-badge">Bientôt disponible</div>
-      )}
-
-      {/* ── Contenu texte + bouton ── */}
-      <div className="feature-card-content">
-        <div className="feature-text-block">
-          <h3 className="feature-card-title">{title}</h3>
-          <p className="feature-card-subtitle">
-            {available ? subtitle : "Fonctionnalité en développement"}
-          </p>
-        </div>
-        <button
-          type="button"
-          className="feature-card-btn"
-          style={{
-            backgroundColor: btnColor,
-            color: btnTextColor || "#333",
-            cursor: available ? "pointer" : "not-allowed",
-          }}
-          onClick={(e) => { e.stopPropagation(); handleClick(); }}
-          disabled={!available}
-        >
-          {available ? buttonText : "Indisponible"}
-          <IonIcon icon={chevronForwardOutline} className="btn-icon" />
-        </button>
+    <button
+      type="button"
+      className={className}
+      onClick={() => {
+        if (disabled) onUnavailable();
+        else onOpen(item.route);
+      }}
+    >
+      {!item.available && <span className="apps-soon">Bientôt</span>}
+      <span className="apps-icon" aria-hidden="true">
+        <Icon />
+      </span>
+      <div className="apps-text">
+        <h3 className="apps-title">{item.title}</h3>
+        <p className="apps-desc">{item.description}</p>
       </div>
-
-    </div>
+      <span className="apps-cta" aria-hidden="true">
+        <MdArrowForward />
+      </span>
+    </button>
   );
 };
 
-/* ================================================
-   PAGE PRINCIPALE
-   ================================================ */
 const AppPage = () => {
   const history = useHistory();
-  const [query, setQuery] = useState("");
-  const [isNoticeOpen, setIsNoticeOpen] = useState(false);
-
-  const openNotice = () => setIsNoticeOpen(true);
-  const closeNotice = () => setIsNoticeOpen(false);
-
-  const filteredSections = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return FEATURE_SECTIONS;
-
-    return FEATURE_SECTIONS.map((section) => {
-      const items = section.items.filter((item) => {
-        const text = `${item.title} ${item.subtitle}`.toLowerCase();
-        return text.includes(q);
-      });
-      return { ...section, items };
-    }).filter((section) => section.items.length > 0);
-  }, [query]);
+  const [showSoonToast, setShowSoonToast] = useState(false);
+  const tiles = useMemo(() => APPS, []);
 
   return (
     <IonPage>
-      <IonHeader className="ion-no-border app-header">
-        <IonToolbar>
-          <IonTitle>Application</IonTitle>
+      <IonHeader className="ion-no-border apps-header">
+        <IonToolbar className="apps-toolbar">
+          <div className="apps-toolbar-inner">
+            <h1 className="apps-page-title">Toutes les Apps</h1>
+          </div>
         </IonToolbar>
       </IonHeader>
 
-      <IonContent className="app-content" fullscreen>
+      <IonContent className="apps-content" fullscreen>
+        <div className="apps-shell">
+          <section className="apps-hero-grid" aria-label="Raccourcis principaux">
+            {tiles
+              .filter((item) => item.size === "hero")
+              .map((item) => (
+                <AppTile
+                  key={item.key}
+                  item={item}
+                  onOpen={(route) => history.push(route)}
+                  onUnavailable={() => setShowSoonToast(true)}
+                />
+              ))}
+          </section>
 
-        {/* ── Barre de recherche ── */}
-        <div className="search-container">
-          <div className="search-box">
-            <IonIcon icon={searchOutline} className="search-icon" />
-            <input
-              type="text"
-              placeholder="Rechercher une fonctionnalité"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </div>
+          <section className="apps-grid" aria-label="Applications">
+            {tiles
+              .filter((item) => item.size !== "hero")
+              .map((item) => (
+                <AppTile
+                  key={item.key}
+                  item={item}
+                  onOpen={(route) => history.push(route)}
+                  onUnavailable={() => setShowSoonToast(true)}
+                />
+              ))}
+          </section>
         </div>
 
-        {/* ── Sections avec cartes carrées ── */}
-        {filteredSections.map((section) => (
-          <section key={section.label} className="app-section">
-
-            {/* Titre de la section */}
-            <h2 className="section-label">{section.label}</h2>
-
-            {/* Rangée de cartes scrollable */}
-            <div className="cards-scroll">
-              {section.items.map((item) => (
-                <FeatureCard
-                  key={item.title}
-                  {...item}
-                  onOpen={(route) => history.push(route)}
-                  onUnavailable={openNotice}
-                />
-              ))}
-            </div>
-
-            {/* Points indicateurs */}
-            <div className="scroll-indicator">
-              {section.items.map((item, index) => (
-                <span
-                  key={`${item.title}-${index}`}
-                  className={`dot ${index === 0 ? "active" : ""}`}
-                />
-              ))}
-            </div>
-
-          </section>
-        ))}
-
-        <div style={{ height: 32 }} />
-
-        {isNoticeOpen && (
-          <div className="feature-notice-modal">
-            <button className="feature-notice-backdrop" onClick={closeNotice} aria-label="Fermer" />
-            <div className="feature-notice-card" role="dialog" aria-modal="true">
-              <h3>Information</h3>
-              <p>Pas encore disponible sur les fonctionnalités en développement.</p>
-              <button type="button" className="feature-notice-close" onClick={closeNotice}>Fermer</button>
-            </div>
-          </div>
-        )}
+        <IonToast
+          isOpen={showSoonToast}
+          onDidDismiss={() => setShowSoonToast(false)}
+          message="Bientot disponible"
+          duration={1800}
+          position="top"
+        />
       </IonContent>
     </IonPage>
   );

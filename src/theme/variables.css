@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --estim-green: #117a2a;
   --estim-green-rgb: 17, 122, 42;
   --estim-gold: #FFE208;
@@ -9,7 +9,7 @@
   --estim-tab-muted: #1f1f1f;
   --estim-tab-border: #ece8df;
   --estim-font-display: "Quicksand", "Helvetica", Arial, sans-serif;
-  --estim-font-text: "Helvetica", Arial, sans-serif;
+  --estim-font-text: "Quicksand", "Helvetica", Arial, sans-serif;
   --estim-btn-radius: 100px;
 
   --ion-color-primary: var(--estim-gold);

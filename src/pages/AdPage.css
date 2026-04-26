@@ -1,15 +1,14 @@
-/* ================================================
-   ESTIM APP – AdPage.css (Refactorisé)
-   ================================================ */
+/* AdPage.css */
 
-/* ── Variables & Fond ── */
 .tab3-content {
-  --background: #F9FCF5;
+  --background: #f9fcf5;
 }
 
 .tab3-header ion-toolbar {
-  --background: white;
+  --background: #ffffff;
   --min-height: 76px;
+  --border-width: 0;
+  --box-shadow: none;
 }
 
 .tab3-toolbar-inner {
@@ -25,35 +24,33 @@
 .tab3-subtitle {
   font-size: 12px;
   color: var(--estim-green);
-  font-weight: 600;
+  font-weight: 700;
   margin: 0;
 }
 
-/* ── Searchbar Container ── */
 .search-container {
   padding: 10px 16px;
-  background: white;
+  background: #ffffff;
 }
 
 .tab3-searchbar {
-  --background: #F5F5F5;
-  --border-radius: 12px;
+  --background: #f5f5f5;
+  --border-radius: 14px;
   --box-shadow: none;
   --placeholder-color: #919191;
-  --icon-color: #BFBFBF;
+  --icon-color: #bfbfbf;
   --color: #000;
   padding: 0;
   height: 52px;
   font-size: 14px;
 }
 
-/* ── Filtres ── */
 .tab3-filters {
   display: flex;
   gap: 8px;
   padding: 8px 16px 16px;
   overflow-x: auto;
-  background: white;
+  background: #ffffff;
 }
 
 .tab3-filters::-webkit-scrollbar {
@@ -63,84 +60,103 @@
 .tab3-filter-btn {
   flex-shrink: 0;
   padding: 8px 20px;
-  border-radius: 20px;
-  border: 1px solid #1A4C00; /* Vert bordure */
-  background: #F7F7F7;
-  color: #1A4C00;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 122, 42, 0.5);
+  background: #f7f7f7;
+  color: #1a4c00;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
 }
 
 .tab3-filter-btn--active {
-  background: #1A4C00;
-  color: white;
+  background: #1a4c00;
+  border-color: #1a4c00;
+  color: #ffffff;
 }
 
-/* ── Liste ── */
 .ann-list {
   padding: 0 16px 32px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
-/* ── Carte Annonce ── */
+.ann-loading {
+  padding: 10px 4px;
+  font-weight: 700;
+  color: #7a7a7a;
+}
+
 .ann-card {
   width: 100%;
-  background: white;
-  border-radius: 16px;
-  overflow: hidden;
-  border: none;
-  padding: 0;
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(17, 122, 42, 0.08);
+  padding: 14px;
   text-align: left;
-  box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.08);
+  box-shadow: 0px 6px 18px rgba(18, 18, 18, 0.06);
   position: relative;
-  display: block;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.ann-card:active {
+  transform: translateY(1px);
 }
 
 .ann-badge-new {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: #40D600;
-  color: white;
+  top: 10px;
+  right: 10px;
+  background: #40d600;
+  color: #ffffff;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 800;
   padding: 4px 8px;
-  border-radius: 12px;
+  border-radius: 999px;
   z-index: 2;
 }
 
-.ann-cover {
-  width: 100%;
-  height: 160px;
-  background: #f0f0f0;
-  position: relative;
+.ann-thumb {
+  width: 96px;
+  height: 96px;
+  flex: 0 0 auto;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #f0f2f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.ann-cover-img {
+.ann-thumb-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
-.ann-card-body {
-  padding: 16px;
+.ann-main {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 2px 2px 0;
 }
 
 .ann-title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 800;
   margin: 0 0 8px;
-  color: #000;
+  color: #000000;
+  letter-spacing: -0.02em;
 }
 
 .ann-body {
-  font-size: 12px;
-  color: #666;
-  margin: 0 0 16px;
+  font-size: 13px;
+  color: #6a7280;
+  margin: 0;
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -148,30 +164,56 @@
   overflow: hidden;
 }
 
-.ann-footer {
+.ann-meta-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
+  margin-top: 14px;
 }
 
 .ann-date {
   font-size: 11px;
-  color: #888;
+  color: #7f8792;
   display: flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
 }
 
-.ann-read-more {
-  background: #40D600;
-  color: white;
+.ann-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px 6px 6px;
+  border-radius: 999px;
   font-size: 12px;
-  font-weight: 700;
-  padding: 6px 16px;
-  border-radius: 20px;
+  font-weight: 800;
+  white-space: nowrap;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* ── Modal (Feuille de détail) ── */
+.ann-chip-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.82);
+  font-size: 16px;
+  flex: 0 0 auto;
+}
+
+.ann-chip-label {
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Modal */
 .ann-modal-overlay {
   position: fixed;
   inset: 0;
@@ -182,7 +224,7 @@
 }
 
 .ann-modal-sheet {
-  background: white;
+  background: #ffffff;
   width: 100%;
   border-radius: 24px 24px 0 0;
   max-height: 85vh;
@@ -192,8 +234,12 @@
 }
 
 @keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 .ann-modal-header {
@@ -203,13 +249,13 @@
   position: relative;
   border-bottom: 1px solid #eee;
   z-index: 2;
-  background: white;
+  background: #ffffff;
 }
 
 .ann-modal-handle {
   width: 40px;
   height: 4px;
-  background: #BABABA;
+  background: #bababa;
   border-radius: 2px;
   margin-top: 4px;
 }
@@ -221,23 +267,14 @@
   transform: translateY(-50%);
   background: #eee;
   border: none;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 20px;
   cursor: pointer;
-}
-
-.ann-modal-content {
-  padding: 24px;
-  overflow-y: auto;
-}
-
-.ann-modal-content--with-image {
-  padding-top: 20px;
 }
 
 .ann-modal-media {
@@ -255,17 +292,54 @@
   object-position: center;
 }
 
+.ann-modal-placeholder {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f5ef;
+  border-bottom: 1px solid #eee;
+}
+
+.ann-modal-placeholder-img {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  border-radius: 18px;
+}
+
+.ann-modal-content {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.ann-modal-content--with-image {
+  padding-top: 20px;
+}
+
+.ann-modal-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 8px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
 .ann-modal-title {
   font-size: 20px;
   font-weight: 800;
-  margin-bottom: 16px;
+  margin: 0 0 16px;
 }
 
 .ann-modal-desc {
   font-size: 14px;
   line-height: 1.6;
   color: #333;
-  margin-bottom: 24px;
+  margin: 0 0 24px;
 }
 
 .ann-modal-features {
@@ -280,11 +354,11 @@
   align-items: center;
   gap: 10px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .ann-modal-feature-item .feature-icon {
-  color: #40D600;
+  color: #40d600;
   font-size: 18px;
 }
 
@@ -307,3 +381,74 @@
     padding: 20px;
   }
 }
+
+@media (max-width: 360px) {
+  .tab3-toolbar-inner {
+    padding: 12px 12px 6px;
+  }
+
+  .search-container {
+    padding: 8px 12px;
+  }
+
+  .tab3-filters {
+    padding: 8px 12px 14px;
+  }
+
+  .ann-list {
+    padding: 0 12px 24px;
+  }
+
+  .ann-card {
+    padding: 12px;
+    gap: 12px;
+    border-radius: 16px;
+  }
+
+  .ann-thumb {
+    width: 86px;
+    height: 86px;
+    border-radius: 18px;
+  }
+}
+
+@media (min-width: 768px) {
+  .tab3-toolbar-inner,
+  .search-container,
+  .tab3-filters,
+  .ann-list {
+    max-width: 980px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .tab3-toolbar-inner {
+    padding: 18px 24px 10px;
+  }
+
+  .tab3-title {
+    font-size: 30px;
+  }
+
+  .search-container {
+    padding: 10px 24px;
+  }
+
+  .tab3-filters {
+    padding: 8px 24px 18px;
+  }
+
+  .ann-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    padding: 0 24px 40px;
+  }
+
+  .ann-modal-sheet {
+    max-width: 880px;
+    margin: 0 auto;
+    border-radius: 24px 24px 0 0;
+  }
+}
+

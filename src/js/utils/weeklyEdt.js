@@ -113,6 +113,10 @@ export const extractFiliere = (classe) => {
 };
 
 export const extractLevel = (classe) => {
+  if (typeof classe?.niveau === 'string' && classe.niveau.trim()) {
+    return classe.niveau.trim();
+  }
+
   return (
     classe?.niveau?.code ||
     classe?.niveau?.libelle ||

@@ -1,4 +1,5 @@
-import { IonContent, IonPage, IonHeader, IonToolbar } from "@ionic/react";
+﻿import { useState } from "react";
+import { IonContent, IonPage, IonHeader, IonToolbar, IonToast } from "@ionic/react";
 import { useHistory } from "react-router-dom";
 
 import "./HomePage.css";
@@ -9,10 +10,9 @@ import StudentsImage from "../assets/img/estim_girls.svg";
 import PhoneMockup from "../assets/img/phone2.svg";
 
 const quickActions = [
-  { label: "Absences", route: "/absences", icon: "calendar" },
+  { label: "Examens", route: "/examens", icon: "exam" },
   { label: "Emploi du temps", route: "/edt", icon: "schedule" },
   { label: "Annonces", route: "/annonces", icon: "megaphone" },
-  { label: "Examen", route: "/notes", icon: "exam" },
   { label: "Finances", route: "/ressources", icon: "wallet" },
   { label: "Presence", route: "/presence", icon: "presence" },
 ];
@@ -52,21 +52,40 @@ function QuickActionGlyph({ type }) {
 
 function HomePage() {
   const history = useHistory();
+  const [showSoonToast, setShowSoonToast] = useState(false);
+
+  const handleQuickActionClick = (action) => {
+    if (action.label === "Emploi du temps" || action.label === "Annonces" || action.label === "Examens") {
+      history.push(action.route);
+      return;
+    }
+    setShowSoonToast(true);
+  };
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
+      <IonHeader className="home-page-header ion-no-border">
+        <IonToolbar className="home-page-toolbar">
           <div className="edt-header">
             <div className="edt-header-left">
               <h1 className="edt-title">ESTIM</h1>
             </div>
             <div className="edt-header-right">
-              <button className="edt-header-action" type="button" aria-label="Messages">
+              <button
+                className="edt-header-action"
+                type="button"
+                aria-label="Messages"
+                onClick={() => setShowSoonToast(true)}
+              >
                 <span className="edt-badge">9</span>
                 <img className="edt-header-icon" src={ChatMessageIcon} alt="" aria-hidden="true" />
               </button>
-              <button className="edt-header-action" type="button" aria-label="Notifications">
+              <button
+                className="edt-header-action"
+                type="button"
+                aria-label="Notifications"
+                onClick={() => setShowSoonToast(true)}
+              >
                 <span className="edt-badge">7</span>
                 <img className="edt-header-icon" src={NotificationIcon} alt="" aria-hidden="true" />
               </button>
@@ -76,7 +95,6 @@ function HomePage() {
       </IonHeader>
       <IonContent className="home-page-content">
         <div className="home-page-shell">
-
           <section className="home-page-hero">
             <p className="home-page-greeting">Bonjour, brillant</p>
             <p className="home-page-student">
@@ -116,7 +134,7 @@ function HomePage() {
                   key={action.label}
                   className="quick-action-card"
                   type="button"
-                  onClick={() => history.push(action.route)}
+                  onClick={() => handleQuickActionClick(action)}
                 >
                   <span className="quick-action-icon">
                     <QuickActionGlyph type={action.icon} />
@@ -127,6 +145,14 @@ function HomePage() {
             </div>
           </section>
         </div>
+
+        <IonToast
+          isOpen={showSoonToast}
+          onDidDismiss={() => setShowSoonToast(false)}
+          message="Bientot disponible"
+          duration={1800}
+          position="top"
+        />
       </IonContent>
     </IonPage>
   );

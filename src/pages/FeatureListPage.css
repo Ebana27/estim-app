@@ -91,3 +91,51 @@
   font-size: 12px;
   color: #7a7a7a;
 }
+
+@media (max-width: 480px) {
+  .feature-content {
+    padding: 12px;
+  }
+
+  .feature-header ion-title {
+    font-size: 22px;
+    padding-left: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .feature-card-image img {
+    height: 136px;
+  }
+
+  .feature-card-body {
+    padding: 12px;
+  }
+
+  .feature-card-title {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 768px) {
+  .feature-content {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 20px 24px 32px;
+  }
+
+  .feature-header ion-title {
+    font-size: 30px;
+    padding-left: 24px;
+  }
+
+  .feature-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .feature-card-image img {
+    height: 184px;
+  }
+}

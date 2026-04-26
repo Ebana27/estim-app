@@ -8,11 +8,9 @@ import {
   IonRefresherContent,
   IonToolbar,
   IonSearchbar,
-  IonIcon,
 } from '@ionic/react';
-import { closeOutline, checkmarkCircleOutline } from 'ionicons/icons';
+import { MdCampaign, MdCheckCircle, MdClose, MdEvent, MdFolder, MdMenuBook } from 'react-icons/md';
 
-import studentImage from '../assets/img/student.svg';
 import EstimApi from '../js/api/estimApi';
 import { mapApiAdToAnnouncement } from '../js/utils/estimMappers';
 import './AdPage.css';
@@ -22,7 +20,7 @@ const CACHE_KEY = 'estim_ads_cache';
 const ADS_NOTIFIED_KEY = 'estim_ads_notified';
 
 // --- Données fictives (Fallback ultime) ---
-const fallbackImage = studentImage;
+const fallbackImage = '/favicon.png';
 const mockAnnouncements = [
   {
     id: 1,
@@ -30,7 +28,7 @@ const mockAnnouncements = [
     body: "Découvrir l'application créer par un étudiant pour des étudiants...",
     category: 'Evenement',
     date: '16 Mars 2026',
-    time: '10h23',
+    time: '10h23', 
     isNew: true,
     image: fallbackImage,
   },
@@ -71,6 +69,23 @@ const isFallbackAnnouncementImage = (image) => {
 
 const shouldShowModalImage = (item) => {
   return Boolean(item?.image) && !isFallbackAnnouncementImage(item.image);
+};
+
+const getCategoryIcon = (category) => {
+  switch (category) {
+    case 'Academique':
+      return MdMenuBook;
+    case 'Administratif':
+      return MdFolder;
+    case 'Evenement':
+      return MdEvent;
+    default:
+      return MdCampaign;
+  }
+};
+
+const getChipColors = (category) => {
+  return categoryColors[category] || { bg: 'rgba(18, 18, 18, 0.06)', color: '#121212' };
 };
 
 const requestAdNotificationPermission = async () => {
@@ -126,26 +141,31 @@ const scheduleAdNotifications = async (list) => {
 // --- Composants ---
 
 const AnnouncementCard = ({ item, onClick }) => {
-  const colors = categoryColors[item.category] || { bg: '#eee', color: '#555' };
+  const CategoryIcon = getCategoryIcon(item?.category);
+  const chip = getChipColors(item?.category);
+  const chipLabel = categoryLabels[item?.category] || item?.category || 'Annonce';
 
   return (
     <button className="ann-card" onClick={() => onClick(item)}>
       {item.isNew && <span className="ann-badge-new">Nouveau</span>}
       
-      <div className="ann-cover">
-        <img className="ann-cover-img" src={item.image} alt={item.title} />
+      <div className="ann-thumb">
+        <img className="ann-thumb-img" src={item.image} alt={item.title} />
       </div>
 
-      <div className="ann-card-body">
+      <div className="ann-main">
         <h3 className="ann-title">{item.title}</h3>
         <p className="ann-body">{item.body}</p>
-        
-        <div className="ann-footer">
+
+        <div className="ann-meta-row">
+          <div className="ann-chip" style={{ background: chip.bg, color: chip.color }}>
+            <span className="ann-chip-icon" aria-hidden="true">
+              <CategoryIcon />
+            </span>
+            <span className="ann-chip-label">{chipLabel}</span>
+          </div>
           <div className="ann-date">
             <span>{item.time} | {item.date}</span>
-          </div>
-          <div className="ann-read-more">
-            Lire
           </div>
         </div>
       </div>
@@ -158,6 +178,9 @@ const AnnouncementModal = ({ item, onClose }) => {
 
   const isEstimApp = item.title.includes('ESTIM APP');
   const hasModalImage = shouldShowModalImage(item);
+  const CategoryIcon = getCategoryIcon(item?.category);
+  const chip = getChipColors(item?.category);
+  const chipLabel = categoryLabels[item?.category] || item?.category || 'Annonce';
   const features = [
     "Lecture D'emploi Du Temps",
     "Annonce & Evenements",
@@ -170,8 +193,8 @@ const AnnouncementModal = ({ item, onClose }) => {
       <div className="ann-modal-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="ann-modal-header">
           <div className="ann-modal-handle" />
-          <button className="ann-modal-close" onClick={onClose}>
-            <IonIcon icon={closeOutline} />
+          <button className="ann-modal-close" onClick={onClose} aria-label="Fermer">
+            <MdClose />
           </button>
         </div>
 
@@ -181,7 +204,19 @@ const AnnouncementModal = ({ item, onClose }) => {
           </div>
         )}
 
+        {!hasModalImage && (
+          <div className="ann-modal-placeholder" aria-hidden="true">
+            <img className="ann-modal-placeholder-img" src={fallbackImage} alt="" />
+          </div>
+        )}
+
         <div className={`ann-modal-content ${hasModalImage ? 'ann-modal-content--with-image' : ''}`}>
+          <div className="ann-modal-chip" style={{ background: chip.bg, color: chip.color }}>
+            <span className="ann-chip-icon" aria-hidden="true">
+              <CategoryIcon />
+            </span>
+            <span className="ann-chip-label">{chipLabel}</span>
+          </div>
           <h2 className="ann-modal-title">{item.title}</h2>
           <p className="ann-modal-desc">
             {isEstimApp 
@@ -194,7 +229,7 @@ const AnnouncementModal = ({ item, onClose }) => {
             <div className="ann-modal-features">
               {features.map((feat, i) => (
                 <div key={i} className="ann-modal-feature-item">
-                  <IonIcon icon={checkmarkCircleOutline} className="feature-icon" />
+                  <MdCheckCircle className="feature-icon" />
                   <span>{feat}</span>
                 </div>
               ))}
@@ -335,7 +370,7 @@ const AdPage = () => {
           <IonSearchbar
             value={search}
             onIonInput={(e) => setSearch(e.detail.value)}
-            placeholder="Rechercher une fonctionnalité"
+            placeholder="Rechercher une annonce"
             className="tab3-searchbar"
           />
         </div>
@@ -374,4 +409,3 @@ const AdPage = () => {
 };
 
 export default AdPage;
-

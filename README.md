@@ -57,4 +57,4 @@ Ce projet est sous licence [MIT](https://www.google.com/search?q=LICENSE).
 
 ### ✍️ Auteur
 
-Développé avec passion par **Ebana Plamedi (Neocodex)**.
+### Développé avec passion par **Ebana Plamedi (Neocodex)**

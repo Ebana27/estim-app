@@ -1,0 +1,147 @@
+.ios-install-modal {
+  --height: 100%;
+  --width: 100%;
+  --max-width: 680px;
+  --border-radius: 0;
+  --box-shadow: none;
+}
+
+.ios-install-modal::part(backdrop) {
+  background: rgba(8, 17, 40, 0.38);
+  backdrop-filter: blur(6px);
+}
+
+.ios-install-modal::part(content) {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+.ios-install-modal ion-header ion-toolbar {
+  --background: #0f2e6d;
+  --color: #ffffff;
+  --padding-top: max(env(safe-area-inset-top), 8px);
+  --padding-start: 12px;
+  --padding-end: 12px;
+}
+
+.ios-install-close-btn {
+  --color: #ffffff;
+  font-weight: 600;
+}
+
+.ios-install-modal ion-content {
+  --background: linear-gradient(180deg, #f7fbff 0%, #edf3ff 100%);
+  --padding-top: 0;
+  --padding-bottom: calc(24px + env(safe-area-inset-bottom));
+}
+
+.install-shell {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.install-hero {
+  background: #ffffff;
+  border: 1px solid #dbe7ff;
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+}
+
+.install-hero-icon {
+  width: 44px;
+  height: 44px;
+  margin-bottom: 10px;
+}
+
+.install-hero h2 {
+  margin: 0;
+  font-size: 21px;
+  line-height: 1.2;
+  color: #102449;
+}
+
+.install-hero p {
+  margin: 10px 0 0;
+  color: #4d5e83;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.install-steps {
+  display: grid;
+  gap: 10px;
+}
+
+.install-step {
+  display: grid;
+  grid-template-columns: 30px 22px 1fr;
+  gap: 12px;
+  align-items: start;
+  background: #ffffff;
+  border: 1px solid #dbe7ff;
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.step-index {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, #0f62f5 0%, #1743a8 100%);
+}
+
+.step-cdn-icon {
+  width: 22px;
+  height: 22px;
+  margin-top: 3px;
+}
+
+.step-copy h3 {
+  margin: 0;
+  font-size: 15px;
+  color: #102449;
+}
+
+.step-copy p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #4d5e83;
+  line-height: 1.4;
+}
+
+.install-note {
+  background: #eaf2ff;
+  border-left: 4px solid #0f62f5;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #214079;
+}
+
+.ios-install-footer ion-toolbar {
+  --background: #ffffff;
+  --padding-top: 8px;
+  --padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+@media (max-width: 420px) {
+  .install-hero h2 {
+    font-size: 19px;
+  }
+
+  .step-copy h3 {
+    font-size: 14px;
+  }
+}

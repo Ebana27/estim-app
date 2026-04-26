@@ -1,4 +1,3 @@
-@import "@fontsource/quicksand/700.css";
 @import "./theme/variables.css";
 
 @font-face {
@@ -57,4 +56,28 @@ h5,
 h6,
 .font-display {
   font-family: var(--estim-font-display);
+}
+
+@media (max-width: 360px) {
+  body,
+  ion-app,
+  ion-content,
+  ion-page,
+  ion-header,
+  ion-toolbar,
+  * {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 768px) {
+  body,
+  ion-app,
+  ion-content,
+  ion-page,
+  ion-header,
+  ion-toolbar,
+  * {
+    font-size: 17px;
+  }
 }

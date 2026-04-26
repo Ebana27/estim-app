@@ -1,0 +1,26 @@
+.examens-header ion-toolbar {
+  --background: transparent;
+  --border-width: 0;
+  --box-shadow: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.examens-toolbar::part(container) {
+  background: transparent;
+}
+
+.examens-search {
+  margin: 0 0 14px;
+}
+
+.examens-searchbar {
+  --background: #ffffff;
+  --border-radius: 14px;
+  --box-shadow: none;
+  --placeholder-color: #9aa1ac;
+  --icon-color: #b3b8c2;
+  --color: #222;
+  padding: 0;
+}
+

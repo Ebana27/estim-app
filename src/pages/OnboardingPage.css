@@ -209,3 +209,107 @@
   width: 16px;
   height: 16px;
 }
+
+@media (max-width: 480px) {
+  .ob-topbar {
+    padding: 20px 12px 0;
+  }
+
+  .ob-visual {
+    height: 56%;
+  }
+
+  .ob-body {
+    padding: 0 18px 36px;
+  }
+
+  .ob-title {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 360px) {
+  .ob-counter {
+    font-size: 12px;
+    padding: 3px 10px;
+  }
+
+  .ob-skip {
+    font-size: 11px;
+  }
+
+  .ob-visual {
+    height: 52%;
+  }
+
+  .ob-img--students {
+    width: calc(100% - 20px);
+  }
+
+  .ob-img--mockup {
+    width: 146%;
+    top: 16%;
+  }
+
+  .ob-title {
+    font-size: 22px;
+  }
+
+  .ob-desc {
+    font-size: 13px;
+  }
+
+  .ob-btn {
+    height: 50px;
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 768px) {
+  .ob-screen {
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  .ob-topbar {
+    padding: 24px 24px 0;
+  }
+
+  .ob-visual {
+    height: 62%;
+  }
+
+  .ob-blob {
+    left: 8%;
+    right: 8%;
+    border-radius: 0 0 50% 50% / 0 0 42% 42%;
+  }
+
+  .ob-img--students {
+    max-width: 520px;
+    bottom: -20px;
+  }
+
+  .ob-img--mockup {
+    max-width: 620px;
+    width: 100%;
+    top: 4%;
+  }
+
+  .ob-body {
+    padding: 0 56px 46px;
+  }
+
+  .ob-title {
+    font-size: clamp(32px, 3.8vw, 44px);
+  }
+
+  .ob-desc {
+    font-size: 16px;
+    max-width: 520px;
+  }
+
+  .ob-btn {
+    max-width: 400px;
+  }
+}

@@ -1,0 +1,383 @@
+/* Backup of previous AppPage.css */
+
+/* ================================================
+   ESTIM APP – AppPage.css
+   ================================================ */
+
+/* -- Fond général -- */
+.app-content {
+  --background: #F9FCF5;
+}
+
+/* -- Header -- */
+.app-header ion-toolbar {
+  --background: white;
+  --min-height: 76px;
+  --border-width: 0;
+}
+.app-header ion-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #000;
+  padding-left: 16px;
+}
+
+/* -- Barre de recherche -- */
+.search-container {
+  padding: 20px 16px;
+}
+.search-box {
+  background: #F5F5F5;
+  border: 0.5px solid #BDBDBD;
+  border-radius: 8px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+}
+.search-box input {
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 16px;
+  color: #919191;
+}
+.search-icon {
+  font-size: 20px;
+  color: #BFBFBF;
+}
+
+/* -- Section -- */
+.app-section {
+  margin-bottom: 24px;
+}
+.section-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #303030;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-left: 16px;
+  margin-bottom: 12px;
+}
+
+/* -- Rangée de cartes scrollable -- */
+.cards-scroll {
+  display: flex;
+  overflow-x: auto;
+  padding: 0 16px;
+  gap: 12px;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+}
+.cards-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* --------------------------------------
+   CARTE CARRÉE
+-------------------------------------- */
+.feature-card {
+  /* Carré – même largeur et hauteur */
+  min-width: 160px;
+  width: 160px;
+  height: 160px;
+
+  /* Positionnement des couches */
+  position: relative;
+  overflow: hidden;
+
+  /* Coins arrondis */
+  border-radius: 16px;
+
+  /* Scroll snap */
+  scroll-snap-align: start;
+  flex-shrink: 0;
+
+  /* Curseur */
+  cursor: pointer;
+
+  /* Légère ombre */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* -- Image de fond (peu opaque) -- */
+.feature-card-bg {
+  position: absolute;
+  inset: 0;           /* = top/right/bottom/left: 0 */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+
+  /* Opacité basse : on voit la couleur par-dessus */
+  opacity: 0.28;
+}
+
+/* -- Couche de couleur par-dessus l'image -- */
+.feature-card-color-layer {
+  position: absolute;
+  inset: 0;
+  /* La couleur est définie en inline style dans le JSX */
+  /* On mixe avec l'image grâce à mix-blend-mode */
+  mix-blend-mode: multiply;
+}
+
+/* -- Dégradé sombre en bas (lisibilité du texte) -- */
+.feature-card-fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.75) 0%,
+    rgba(0, 0, 0, 0.0) 55%
+  );
+}
+
+/* -- Contenu texte + bouton (au-dessus de tout) -- */
+.feature-card-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* -- Bloc texte -- */
+.feature-text-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.feature-card-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: 0.3px;
+}
+.feature-card-subtitle {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.80);
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* -- Bouton -- */
+.feature-card-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 12px;
+  border-radius: 50px;
+  border: none;
+  font-size: 11px;
+  font-weight: 700;
+  width: fit-content;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.feature-card-btn:active {
+  opacity: 0.85;
+  transform: scale(0.97);
+}
+.btn-icon {
+  font-size: 11px;
+}
+
+/* -- Badge "Bientôt disponible" -- */
+.coming-soon-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #666;
+  padding: 3px 8px;
+  border-radius: 50px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* -- Points indicateurs -- */
+.scroll-indicator {
+  display: flex;
+  justify-content: flex-start;
+  padding: 10px 16px 0;
+  gap: 6px;
+}
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #CCCCCC;
+}
+.dot.active {
+  background-color: #4C4C4C;
+}
+
+IonPage {
+  --margin: 10px;
+  margin: 10px;
+}
+/* --- Notice modal --- */
+.feature-notice-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.feature-notice-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  border: none;
+}
+
+.feature-notice-card {
+  position: relative;
+  background: #fff;
+  width: min(520px, 92vw);
+  border-radius: 16px 16px 0 0;
+  padding: 20px 18px 24px;
+  box-shadow: 0 -8px 20px rgba(0,0,0,0.12);
+}
+
+.feature-notice-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #111;
+}
+
+.feature-notice-card p {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.feature-notice-close {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 10px;
+  font-weight: 800;
+  font-size: 14px;
+  background: #02F00E;
+  color: #041B08;
+  cursor: pointer;
+}
+.ios-install-trigger {
+  margin-top: 12px;
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0f62f5 0%, #1743a8 100%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 12px 14px;
+  box-shadow: 0 8px 18px rgba(15, 98, 245, 0.22);
+}
+
+.ios-install-trigger:active {
+  transform: translateY(1px);
+}
+
+@media (max-width: 480px) {
+  IonPage {
+    margin: 0;
+  }
+
+  .app-header ion-title {
+    font-size: 24px;
+  }
+
+  .search-container {
+    padding: 14px 12px;
+  }
+
+  .cards-scroll {
+    padding: 0 12px;
+  }
+
+  .section-label {
+    padding-left: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .search-box {
+    height: 48px;
+    padding: 0 12px;
+  }
+
+  .search-box input {
+    font-size: 14px;
+  }
+
+  .feature-card {
+    min-width: 148px;
+    width: 148px;
+    height: 148px;
+  }
+}
+
+@media (min-width: 768px) {
+  IonPage {
+    margin: 0;
+  }
+
+  .app-content {
+    --padding-top: 8px;
+  }
+
+  .search-container,
+  .app-section,
+  .scroll-indicator {
+    max-width: 980px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .search-container {
+    padding: 20px 24px 14px;
+  }
+
+  .section-label {
+    padding-left: 24px;
+    font-size: 15px;
+  }
+
+  .cards-scroll {
+    padding: 0 24px;
+    gap: 14px;
+    overflow-x: visible;
+    flex-wrap: wrap;
+    scroll-snap-type: none;
+  }
+
+  .feature-card {
+    min-width: 180px;
+    width: calc((100% - 28px) / 3);
+    max-width: 280px;
+    height: 180px;
+  }
+
+  .scroll-indicator {
+    display: none;
+  }
+}
+
