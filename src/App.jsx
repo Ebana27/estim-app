@@ -40,9 +40,9 @@ import "@ionic/react/css/display.css";
 
 import "./theme/variables.css";
 import "./App.css";
-import HomeIcon from "./assets/img/Home.svg";
-import AppsIcon from "./assets/img/AppsIcon.svg";
-import ProfileIcon from "./assets/img/profile.svg";
+
+// Import des 3 icônes react-icons/md demandées
+import { MdHome, MdApps, MdAccountCircle } from "react-icons/md";
 
 setupIonicReact();
 
@@ -90,15 +90,15 @@ const AppRoutes = ({ shouldShowOnboarding, onOnboardingDone }) => {
 
           <IonTabBar slot="bottom">
             <IonTabButton tab="home" href="/home">
-              <img className="tab-icon-image tab-icon-home" src={HomeIcon} alt="" aria-hidden="true" />
+              <MdHome className="tab-icon-react" />
               <IonLabel>Accueil</IonLabel>
             </IonTabButton>
             <IonTabButton tab="apps" href="/apps">
-              <img className="tab-icon-image" src={AppsIcon} alt="" aria-hidden="true" />
+              <MdApps className="tab-icon-react" />
               <IonLabel>Apps</IonLabel>
             </IonTabButton>
             <IonTabButton tab="profile" onClick={handleProfileClick}>
-              <img className="tab-icon-image tab-icon-profile" src={ProfileIcon} alt="" aria-hidden="true" />
+              <MdAccountCircle className="tab-icon-react" />
               <IonLabel>Profile</IonLabel>
             </IonTabButton>
           </IonTabBar>

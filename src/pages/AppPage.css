@@ -23,6 +23,7 @@
   font-weight: 900;
   letter-spacing: -0.04em;
   color: #111;
+  position: relative;
 }
 
 .apps-shell {
@@ -30,8 +31,9 @@
 }
 
 .apps-hero-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  justify-content: center;
+  grid-template-columns: 2fr;
   gap: 14px;
   margin-bottom: 16px;
 }
@@ -42,7 +44,6 @@
   min-height: 220px;
   background: #f0f2f6;
   border: 1px solid rgba(18, 18, 18, 0.06);
-  box-shadow: 0 10px 30px rgba(18, 18, 18, 0.06);
 }
 
 .apps-hero-image-img {
@@ -53,30 +54,44 @@
   object-position: center;
 }
 
+/* ---------------------------------------------------------
+   LA GRILLE PRINCIPALE (MOBILE)
+   --------------------------------------------------------- */
 .apps-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, 1fr); /* Force exactement 2 colonnes */
   gap: 12px;
 }
 
+/* ---------------------------------------------------------
+   CORRECTION DU SPAN2 SUR MOBILE
+   --------------------------------------------------------- */
+.apps-tile--span2 {
+  /* SUR MOBILE : On annule le "span 2" pour forcer la boîte 
+     à ne prendre qu'1 seule colonne et rester côte à côte */
+  grid-column: span 1; 
+}
+
+/* ---------------------------------------------------------
+   INTERIEUR DE LA TUILE (MOBILE)
+   --------------------------------------------------------- */
 .apps-tile {
   position: relative;
   border: 1px solid rgba(18, 18, 18, 0.08);
   background: rgba(255, 255, 255, 0.82);
   border-radius: 22px;
-  padding: 16px 14px;
+  padding: 14px 12px;
   text-align: left;
-  min-height: 132px;
+  min-height: 130px;
   box-shadow: 0 10px 26px rgba(18, 18, 18, 0.05);
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 12px;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   cursor: pointer;
 }
 
 .apps-tile:active {
-  transform: translateY(1px);
+  transform: scale(0.97);
 }
 
 .apps-tile--hero {
@@ -102,51 +117,59 @@
 
 .apps-soon {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 10px;
+  right: 10px;
   background: rgba(18, 18, 18, 0.08);
   color: #222;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
-  padding: 6px 10px;
+  padding: 4px 8px;
   border-radius: 999px;
 }
 
 .apps-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
+  width: 44px; /* Légèrement réduit pour bien rentrer dans 50% d'écran */
+  height: 44px;
+  border-radius: 14px;
   background: rgba(255, 226, 8, 0.34);
   color: #111;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 22px;
   flex: 0 0 auto;
 }
 
 .apps-text {
   min-width: 0;
+  flex: 1;
 }
 
 .apps-title {
-  margin: 0 0 8px;
-  font-size: 18px;
+  margin: 0 0 2px;
+  font-size: 15px;
   font-weight: 900;
   letter-spacing: -0.02em;
   color: #111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .apps-desc {
   margin: 0;
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 12px;
+  line-height: 1.4;
   color: rgba(18, 18, 18, 0.66);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .apps-cta {
-  width: 38px;
-  height: 38px;
+  width: 30px;
+  height: 30px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.85);
   border: 1px solid rgba(18, 18, 18, 0.08);
@@ -154,8 +177,9 @@
   align-items: center;
   justify-content: center;
   color: #111;
-  font-size: 20px;
-  align-self: end;
+  font-size: 16px;
+  align-self: flex-end;
+  margin-top: auto;
 }
 
 .apps-tile--hero .apps-cta {
@@ -164,10 +188,9 @@
   border-color: rgba(18, 18, 18, 0.1);
 }
 
-.apps-tile--span2 {
-  grid-column: span 2;
-}
-
+/* ---------------------------------------------------------
+   PASSAGE TABLETTE (520px)
+   --------------------------------------------------------- */
 @media (min-width: 520px) {
   .apps-hero-grid {
     grid-template-columns: 1fr 1fr;
@@ -177,14 +200,63 @@
     min-height: 240px;
   }
   .apps-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, 1fr); /* 3 colonnes sur tablette */
     gap: 14px;
   }
+  
+  /* Sur tablette, le span2 reprend ses droits pour faire joli */
   .apps-tile--span2 {
     grid-column: span 2;
   }
 }
 
+/* ---------------------------------------------------------
+   PASSAGE DESKTOP (600px+)
+   --------------------------------------------------------- */
+@media (min-width: 600px) {
+  /* On repasse l'intérieur de la tuile en mode horizontal */
+  .apps-tile {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: 12px;
+    padding: 16px 14px;
+    min-height: 132px;
+  }
+
+  .apps-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    font-size: 28px;
+  }
+
+  .apps-title {
+    font-size: 18px;
+    margin: 0 0 8px;
+  }
+
+  .apps-desc {
+    font-size: 13px;
+  }
+
+  .apps-cta {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    width: 38px;
+    height: 38px;
+    font-size: 20px;
+  }
+
+  .apps-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+/* ---------------------------------------------------------
+   TRES GRAND ECRAN (900px+)
+   --------------------------------------------------------- */
 @media (min-width: 900px) {
   .apps-shell,
   .apps-toolbar-inner {
@@ -197,7 +269,421 @@
   }
 
   .apps-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(4, 1fr); /* 4 colonnes sur Desktop */
   }
 }
 
+.apps-content {
+  --background: #f2f2f7; /* Gris clair moderne style iOS */
+}
+
+/* ---------------------------------------------------------
+   PLUS DE HEADER FIXE : Le titre fait partie du scroll
+   --------------------------------------------------------- */
+.apps-header ion-toolbar {
+  display: none; /* On cache l'ancien header fixe */
+}
+
+.apps-shell {
+  padding: 20px 16px 60px;
+}
+
+.apps-page-title {
+  margin: 0 0 20px 4px;
+  font-size: clamp(2rem, 6vw, 2.8rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: #111;
+}
+
+/* ---------------------------------------------------------
+   LA GRILLE PRINCIPALE
+   --------------------------------------------------------- */
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+/* ---------------------------------------------------------
+   DESIGN DES TUILES (Avec Image de fond)
+   --------------------------------------------------------- */
+.apps-tile {
+  position: relative;
+  border-radius: 24px;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden; /* Important pour que l'image respecte le border-radius */
+  
+  /* Gestion de l'image de fond */
+  background-size: cover;
+  background-position: center;
+  background-color: #e0e0e0; /* Couleur de chargement */
+  
+  /* Hauteur fixe pour que la grille soit parfaitement alignée */
+  aspect-ratio: 1 / 1.15; 
+  border: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Rajouter de la couleur */ 
+.apps-tile::after {
+  
+}
+
+/* Overlay sombre pour rendre le texte lisible sur l'image */
+.apps-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.1) 100%);
+  z-index: 1;
+  border-radius: inherit;
+}
+
+.apps-tile:active {
+  transform: scale(0.96);
+}
+
+/* On met un z-index supérieur pour que le contenu soit au-dessus de l'overlay */
+.apps-icon,
+.apps-text,
+.apps-cta,
+.apps-soon {
+  position: relative;
+  z-index: 2;
+}
+
+/* ---------------------------------------------------------
+   ICONES (Plus grandes et effet Glassmorphism)
+   --------------------------------------------------------- */
+.apps-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  margin-bottom: auto; /* Pousse le texte vers le bas */
+}
+
+/* ---------------------------------------------------------
+   TEXTE (Blanc sur l'image)
+   --------------------------------------------------------- */
+.apps-text {
+  margin-top: 12px;
+}
+
+.apps-title {
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.apps-desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.85);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* ---------------------------------------------------------
+   BOUTON CTA & BADGE "BIENTOT"
+   --------------------------------------------------------- */
+.apps-cta {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  z-index: 2;
+}
+
+.apps-soon {
+  top: 16px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.apps-tile.is-disabled {
+  opacity: 0.85;
+}
+
+/* ---------------------------------------------------------
+   TABLETTE & DESKTOP
+   --------------------------------------------------------- */
+@media (min-width: 600px) {
+  .apps-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .apps-tile {
+    aspect-ratio: 1 / 1.1;
+    padding: 20px;
+  }
+  .apps-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 32px;
+  }
+  .apps-title {
+    font-size: 19px;
+  }
+}
+
+@media (min-width: 900px) {
+  .apps-shell {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .apps-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ==========================================
+   FOND DE PAGE
+   ========================================== */
+.apps-content {
+  --background: #f2f2f7;
+}
+
+/* ==========================================
+   STRUCTURE PRINCIPALE
+   ========================================== */
+.apps-shell {
+  padding: 20px 16px 60px;
+}
+
+.apps-page-title {
+  margin: 0 0 20px 4px;
+  font-size: clamp(2rem, 6vw, 2.8rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: #111;
+}
+
+/* ==========================================
+   GRILLE (2 COLONNES)
+   ========================================== */
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+/* ==========================================
+   TUILE & IMAGE DE FOND
+   ========================================== */
+.apps-tile {
+  position: relative;
+  border-radius: 24px;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  
+  background-size: cover;
+  background-position: center;
+  background-color: #e0e0e0; 
+  
+  /* Proportions fixes pour aligner les tuiles parfaitement */
+  aspect-ratio: 1 / 1.15; 
+  border: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* ---------------------------------------------------------
+   DÉGRADÉ SOLIDE SUR L'IMAGE (Pas de flou, juste de l'opacité)
+   --------------------------------------------------------- */
+.apps-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* Transition très douce du noir vers le transparent */
+  background: linear-gradient(
+    to top, 
+    rgba(0, 0, 0, 0.85) 0%,   /* Noir opaque en bas pour le texte */
+    rgba(0, 0, 0, 0.4) 40%,   /* Gris au milieu */
+    rgba(0, 0, 0, 0.05) 100%  /* Quasi transparent en haut pour voir l'image */
+  );
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.apps-tile:active {
+  transform: scale(0.96);
+  transition: transform 0.1s ease;
+}
+
+/* Mettre le contenu au-dessus du dégradé */
+.apps-icon,
+.apps-text,
+.apps-cta,
+.apps-soon {
+  position: relative;
+  z-index: 2;
+}
+
+/* ==========================================
+   ICONE (COULEUR SOLIDE JAUNE)
+   ========================================== */
+.apps-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: #ffffff; /* Couleur solide de ta charte */
+  color: #000000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  border: none;
+  /* Ombre classique et nette (pas de blur de fond) */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  margin-bottom: auto; 
+}
+
+/* ==========================================
+   TEXTE
+   ========================================== */
+.apps-text {
+  margin-top: 12px;
+}
+
+.apps-title {
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.apps-desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.9);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================
+   BOUTON CTA (COULEUR SOLIDE BLANC)
+   ========================================== */
+.apps-cta {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #ffffff; /* Blanc solide */
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #111;
+  font-size: 18px;
+}
+
+/* ==========================================
+   BADGE "BIENTOT" (COULEUR SOLIDE)
+   ========================================== */
+.apps-soon {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #ffffff; /* Solide */
+  color: #111;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.apps-tile.is-disabled {
+  opacity: 0.85;
+}
+
+/* ==========================================
+   VERSION TABLETTE (600px+)
+   ========================================== */
+@media (min-width: 600px) {
+  .apps-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .apps-tile {
+    aspect-ratio: 1 / 1.1;
+    padding: 20px;
+  }
+  .apps-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 32px;
+  }
+  .apps-title {
+    font-size: 19px;
+  }
+}
+
+/* ==========================================
+   VERSION DESKTOP (900px+)
+   ========================================== */
+@media (min-width: 900px) {
+  .apps-shell {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .apps-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
